@@ -1,0 +1,12 @@
+{
+  "name": "muzhu-blog",
+  "version": "1.0.0",
+  "description": "木竹博客",
+  "scripts": {
+    "build": "hugo",
+    "dev": "hugo server"
+  },
+  "devDependencies": {
+    "hugo-extended": "^0.152.2"
+  }
+}
