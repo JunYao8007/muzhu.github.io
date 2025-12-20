@@ -1,0 +1,34 @@
+baseURL = "https://laomuzhu.cn/"
+languageCode = "en-us"
+title = "木 竹 造 价"
+theme = "yinyang"
+DefaultContentLanguage = "cn"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    guessSyntax = true
+    noClasses = true
+    style = "bw"
+    tabWidth = 2
+
+[author]
+  name = "王君尧"
+  homepage = "https://laomuzhu.cn/"
+
+
+[params]
+mainSections = ["posts"]
+headTitle = "Mu Zhu"
+[[params.socials]]
+name = "Posts"
+link = "/posts/"
+[[params.socials]]
+name = "About Me"
+link = "/about/"
+
+
+# extraCSSFiles = ["css/foo.css", "css/bar.css"]
+extraCSSFiles = []
