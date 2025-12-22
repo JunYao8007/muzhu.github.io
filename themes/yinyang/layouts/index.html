@@ -7,9 +7,39 @@
     <div class="row">
       <div class="col-xs-12">
         {{ partial "header.html" . }}
-        <div class="post-content">
-          {{ .Content }}
-        </div>
+        
+        <!-- 01 / HOME 介绍区域 -->
+        <section class="home-intro">
+          <div class="section-title">01 / HOME</div>
+          <div class="intro-content">
+            <div class="intro-left">
+              <h1 class="intro-heading">
+                Currently engaged in <span class="highlight">construction cost</span><br>
+                & <span class="highlight">cost consulting</span> industry
+              </h1>
+              <a href="/about/" class="about-button">About Me</a>
+            </div>
+            <div class="intro-right">
+              <p>Hello, welcome to my Blog</p>
+              <p>Here, I will share my thoughts, experiences related to engineering cost, as well as other interesting content that I find interesting</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 02 / RECENT POSTS 最新文章 -->
+        <section class="home-recent">
+          <div class="section-title">02 / 最新文章</div>
+          <div class="recent-posts-grid">
+            {{ range first 2 (where site.RegularPages "Type" "in" site.Params.mainSections) }}
+            <div class="post-card">
+              <h2 class="post-card-title">
+                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+              </h2>
+              <div class="post-card-date">{{ .Date.Format "2006年01月02日" }}</div>
+            </div>
+            {{ end }}
+          </div>
+        </section>
 
         {{ partial "footer.html" . }}
       </div>

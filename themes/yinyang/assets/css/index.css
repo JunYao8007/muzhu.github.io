@@ -1,7 +1,7 @@
 /* global */
 
 body {
-  font-family: "Bree Serif", sans-serif;
+  font-family: 'Opposans', system-ui, serif;
   -webkit-font-smoothing: antialiased;
   margin: 0 20px;
 }
@@ -73,6 +73,13 @@ a:hover {
 
 /* header */
 
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+}
+
 .site-date-catalog {
   font-size: 2rem;
 }
@@ -80,19 +87,40 @@ a:hover {
 .header-title {
   font-size: 2rem;
   font-weight: bold;
-  margin-top: 32px;
   font-family: "Bungee Shade", sans-serif;
 }
 .header-title a {
   text-decoration: none;
 }
 
+.header-logo {
+  width: 32px;
+  height: 32px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .header-subtitle {
   color: #666;
 }
 
+.home-banner {
+  width: 100%;
+  margin: 20px 0;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.home-banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 .header-items {
-  margin: 10px 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .header-item {
@@ -111,7 +139,8 @@ a:hover {
 /* posts list */
 
 #posts-list {
-  min-height: 600px;
+  min-height: auto;
+  margin-top: 50px;
 }
 
 .posts-line {
@@ -133,15 +162,50 @@ a:hover {
 }
 
 .site-footer {
-  margin-top: 50px;
-  /* margin-bottom: 80px; */
-  /* display: flex; */
-  /* justify-content: flex-end; */
-  /* flex-wrap: wrap; */
-  /* padding: 12px 0; */
-  /* border-width: 3px; */
-  /* border-style: solid none; */
-  /* border-color: #000; */
+  margin-top: 80px;
+  padding: 30px 0;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-left {
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.footer-right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.footer-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid #e0e0e0;
+  border-radius: 50%;
+  color: #666;
+  transition: all 0.3s;
+}
+
+.footer-icon:hover {
+  background: #000;
+  border-color: #000;
+  color: #fff;
+  text-decoration: none;
+}
+
+.footer-icon svg {
+  display: block;
+  width: 14px;
+  height: 14px;
 }
 
 .site-footer-item {
@@ -152,11 +216,13 @@ a:hover {
 
 .post-header {
   margin-bottom: 50px;
+  margin-top: 40px;
 }
 
 .post-title {
   font-size: 1.2rem;
   font-weight: 600;
+  margin: 0;
 }
 
 .post-tags {
@@ -194,6 +260,11 @@ a:hover {
   /* text-align: justify; */
   text-justify: ideographic;
   margin-bottom: 1em;
+}
+
+/* 首页特定样式 */
+.posts .post-content p {
+  line-height: 1;
 }
 
 .post-content img {
@@ -293,5 +364,122 @@ a:hover {
 @media screen and (max-width: 48em) {
   .posts-category {
     display: none;
+  }
+}
+
+/* 首页样式 */
+.home-intro {
+  margin: 30px 0 40px 0;
+  padding-bottom: 40px;
+}
+
+.section-title {
+  font-size: 0.8rem;
+  color: #999;
+  margin-bottom: 25px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.intro-content {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.intro-left {
+  flex: 1;
+}
+
+.intro-heading {
+  font-size: 2rem;
+  line-height: 1.3;
+  margin: 0 0 20px 0;
+  font-weight: 400;
+}
+
+.intro-heading .highlight {
+  color: #666;
+  font-style: italic;
+}
+
+.about-button {
+  display: inline-block;
+  background: #000;
+  color: #fff !important;
+  padding: 10px 25px;
+  text-decoration: none !important;
+  font-weight: 600;
+  font-size: 0.8rem;
+  transition: background 0.3s;
+}
+
+.about-button:hover {
+  background: #333;
+  text-decoration: none !important;
+}
+
+.intro-right {
+  flex: 1;
+  color: #999;
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
+.intro-right p {
+  margin: 0 0 0.8em 0;
+}
+
+/* 最新文章区域 */
+.home-recent {
+  margin: 40px 0;
+}
+
+.recent-posts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.post-card {
+  border: 1px solid #e0e0e0;
+  padding: 25px;
+  transition: box-shadow 0.3s;
+}
+
+.post-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.post-card-title {
+  font-size: 1.1rem;
+  margin: 0 0 15px 0;
+  font-weight: 600;
+}
+
+.post-card-title a {
+  color: #000;
+  text-decoration: none;
+}
+
+.post-card-date {
+  color: #999;
+  font-size: 0.8rem;
+}
+
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
+  .intro-content {
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .intro-heading {
+    font-size: 1.8rem;
+  }
+  
+  .recent-posts-grid {
+    grid-template-columns: 1fr;
   }
 }

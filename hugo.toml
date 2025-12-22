@@ -21,15 +21,12 @@ DefaultContentLanguage = "cn"
 
 [params]
 mainSections = ["posts"]
-headTitle = "Mu Zhu"
+headTitle = "muzhu"
 [[params.socials]]
 name = "Posts"
 link = "/posts/"
 [[params.socials]]
-name = "Item"
-link = "/item/"
-[[params.socials]]
-name = "About Me"
+name = "About"
 link = "/about/"
 
 
