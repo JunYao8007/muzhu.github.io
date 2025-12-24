@@ -4,6 +4,27 @@ body {
   font-family: 'Opposans', system-ui, serif;
   -webkit-font-smoothing: antialiased;
   margin: 0 20px;
+  overflow-y: scroll;
+}
+
+
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+body {
+  -ms-overflow-style: none;  /* IE 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+html {
+  overflow-y: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
 }
 
 article {
@@ -162,8 +183,8 @@ a:hover {
 }
 
 .site-footer {
-  margin-top: 80px;
-  padding: 30px 0;
+  margin-top: 8px;
+  padding: 20px 0;
 }
 
 .footer-content {
@@ -369,8 +390,8 @@ a:hover {
 
 /* 首页样式 */
 .home-intro {
-  margin: 30px 0 40px 0;
-  padding-bottom: 40px;
+  margin: 30px 0 20px 0;
+  padding-bottom: 20px;
 }
 
 .section-title {
@@ -379,6 +400,83 @@ a:hover {
   margin-bottom: 25px;
   font-weight: 600;
   letter-spacing: 1px;
+}
+
+/* 技能展示区域 */
+.skills-section {
+  margin: 0 0 40px 0;
+}
+
+.skills-desc {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 30px;
+}
+
+.skills-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow: hidden;
+}
+
+.skills-row {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.skills-track {
+  display: flex;
+  gap: 12px;
+  animation: scroll-left 20s linear infinite;
+  width: fit-content;
+}
+
+.skills-track-reverse {
+  animation: scroll-right 20s linear infinite;
+}
+
+/* 鼠标悬停暂停 */
+.skills-row:hover .skills-track {
+  animation-play-state: paused;
+}
+
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: all 0.3s;
+}
+
+.skill-tag:hover {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+/* 滚动动画 */
+@keyframes scroll-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scroll-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 .intro-content {
@@ -392,7 +490,7 @@ a:hover {
 }
 
 .intro-heading {
-  font-size: 2rem;
+  font-size: 1.4rem;
   line-height: 1.3;
   margin: 0 0 20px 0;
   font-weight: 400;
@@ -407,10 +505,10 @@ a:hover {
   display: inline-block;
   background: #000;
   color: #fff !important;
-  padding: 10px 25px;
+  padding: 8px 20px;
   text-decoration: none !important;
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   transition: background 0.3s;
 }
 
@@ -437,23 +535,36 @@ a:hover {
 
 .recent-posts-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 20px;
   margin-top: 20px;
 }
 
 .post-card {
-  border: 1px solid #e0e0e0;
-  padding: 25px;
-  transition: box-shadow 0.3s;
+  border: none;
+  padding: 15px;
+  transition: none;
+  position: relative;
+}
+
+.new-badge {
+  display: inline-block;
+  background: #000;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  letter-spacing: 0.5px;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
 .post-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
 }
 
 .post-card-title {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   margin: 0 0 15px 0;
   font-weight: 600;
 }
@@ -476,10 +587,46 @@ a:hover {
   }
   
   .intro-heading {
-    font-size: 1.8rem;
+    font-size: 1.2rem;
   }
   
   .recent-posts-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px; /* 进一步减小间距 */
+    padding: 0 5px; /* 添加内边距确保不被吃掉 */
+  }
+  
+  /* 手机端卡片样式调整 */
+  .post-card {
+    padding: 12px; /* 进一步减小内边距 */
+    margin: 0; /* 确保没有外边距 */
+    min-width: 0; /* 防止内容溢出 */
+    word-break: break-all; /* 强制换长单词 */
+  }
+  
+  /* 手机端隐藏NEW标签 */
+  .new-badge {
+    display: none;
+  }
+  
+  /* 手机端隐藏第三篇文章 */
+  .post-card-third {
+    display: none;
+  }
+  
+  /* 手机端标题字号更小 */
+  .post-card-title {
+    font-size: 0.8rem; /* 再小一点 */
+    /* 单行显示，超出部分用省略号 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* 确保不会被压缩 */
+    min-width: 0;
+    flex-shrink: 0;
+    line-height: 1.2;
+    /* 确保在小屏幕上不溢出 */
+    max-width: 100%;
+    box-sizing: border-box;
   }
 }

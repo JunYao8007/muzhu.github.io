@@ -1,6 +1,6 @@
 baseURL = "https://muzhui.cn/"
 languageCode = "en-us"
-title = "木 竹 造 价"
+title = "槌"
 theme = "yinyang"
 DefaultContentLanguage = "cn"
 
@@ -22,6 +22,7 @@ DefaultContentLanguage = "cn"
 [params]
 mainSections = ["posts"]
 headTitle = "muzhu"
+favicon = "/favicon.ico"
 [[params.socials]]
 name = "Posts"
 link = "/posts/"

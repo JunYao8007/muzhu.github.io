@@ -14,28 +14,89 @@
           <div class="intro-content">
             <div class="intro-left">
               <h1 class="intro-heading">
-                Currently engaged in <span class="highlight">construction cost</span><br>
-                & <span class="highlight">cost consulting</span> industry
+                喜欢把复杂的<span class="highlight">图纸</span><br>
+                变成<span class="highlight">简洁优雅</span>造价文件
               </h1>
               <a href="/about/" class="about-button">About Me</a>
             </div>
             <div class="intro-right">
-              <p>Hello, welcome to my Blog</p>
-              <p>Here, I will share my thoughts, experiences related to engineering cost, as well as other interesting content that I find interesting</p>
+              <p>如果您寻来时，页面还未盛满所有心意</p>
+              <p>不妨和角落的 文字 坐一会儿</p>
+              <p>它们是我一字一句攒下的 细碎光阴</p>
+              <p>或许不够华丽，但都在字里行间慢慢生长</p>
             </div>
           </div>
         </section>
 
-        <!-- 02 / RECENT POSTS 最新文章 -->
+        <!-- 02 / 技能展示 -->
+        <section class="skills-section">
+          <div class="section-title">02 / 技能展示</div>
+          
+          <div class="skills-container">
+            <!-- 第一行：向左滚动 -->
+            <div class="skills-row">
+              <div class="skills-track">
+                <span class="skill-tag">工程造价</span>
+                <span class="skill-tag">成本咨询</span>
+                <span class="skill-tag">项目管理</span>
+                <span class="skill-tag">预算编制</span>
+                <span class="skill-tag">结算编制</span>
+                <!-- 复制一遍实现无缝滚动 -->
+                <span class="skill-tag">工程造价</span>
+                <span class="skill-tag">成本咨询</span>
+                <span class="skill-tag">项目管理</span>
+                <span class="skill-tag">预算编制</span>
+                <span class="skill-tag">结算编制</span>
+              </div>
+            </div>
+            
+            <!-- 第二行：向右滚动 -->
+            <div class="skills-row">
+              <div class="skills-track skills-track-reverse">
+                <span class="skill-tag">广联达计价</span>
+                <span class="skill-tag">福莱一点通</span>
+                <span class="skill-tag">新点计价</span>
+                <span class="skill-tag">AutoCAD</span>
+                <span class="skill-tag">BIM建模</span>
+                <!-- 复制一遍 -->
+                <span class="skill-tag">广联达计价</span>
+                <span class="skill-tag">福莱一点通</span>
+                <span class="skill-tag">新点计价</span>
+                <span class="skill-tag">AutoCAD</span>
+                <span class="skill-tag">BIM建模</span>
+              </div>
+            </div>
+            
+            <!-- 第三行：向左滚动 -->
+            <div class="skills-row">
+              <div class="skills-track">
+                <span class="skill-tag">清单计价</span>
+                <span class="skill-tag">定额套用</span>
+                <span class="skill-tag">工程审计</span>
+                <span class="skill-tag">成本分析</span>
+                <span class="skill-tag">投标报价</span>
+                <!-- 复制一遍 -->
+                <span class="skill-tag">清单计价</span>
+                <span class="skill-tag">定额套用</span>
+                <span class="skill-tag">工程审计</span>
+                <span class="skill-tag">成本分析</span>
+                <span class="skill-tag">投标报价</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 03 / RECENT POSTS 最新文章 -->
         <section class="home-recent">
-          <div class="section-title">02 / 最新文章</div>
+          <div class="section-title">03 / 最新文章</div>
           <div class="recent-posts-grid">
-            {{ range first 2 (where site.RegularPages "Type" "in" site.Params.mainSections) }}
-            <div class="post-card">
+            {{ range $index, $page := first 3 (where site.RegularPages "Type" "in" site.Params.mainSections) }}
+            <div class="post-card{{ if eq $index 2 }} post-card-third{{ end }}">
               <h2 class="post-card-title">
-                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                {{ if eq $index 0 }}<span class="new-badge">NEW</span> {{ end }}
+                <a href="{{ $page.RelPermalink }}">{{ $page.Title }}</a>
               </h2>
-              <div class="post-card-date">{{ .Date.Format "2006年01月02日" }}</div>
+              <div class="post-card-date">{{ $page.Date.Format "2006年01月02日" }}</div>
             </div>
             {{ end }}
           </div>
