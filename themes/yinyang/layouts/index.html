@@ -8,87 +8,9 @@
       <div class="col-xs-12">
         {{ partial "header.html" . }}
         
-        <!-- 01 / HOME 介绍区域 -->
-        <section class="home-intro">
-          <div class="section-title">01 / HOME</div>
-          <div class="intro-content">
-            <div class="intro-left">
-              <h1 class="intro-heading">
-                喜欢把复杂的<span class="highlight">图纸</span><br>
-                变成<span class="highlight">简洁优雅</span>造价文件
-              </h1>
-              <a href="/about/" class="about-button">About Me</a>
-            </div>
-            <div class="intro-right">
-              <p>如果您寻来时，页面还未盛满所有心意</p>
-              <p>不妨和角落的 文字 坐一会儿</p>
-              <p>它们是我一字一句攒下的 细碎光阴</p>
-              <p>或许不够华丽，但都在字里行间慢慢生长</p>
-            </div>
-          </div>
-        </section>
-
-        <!-- 02 / 技能展示 -->
-        <section class="skills-section">
-          <div class="section-title">02 / 技能展示</div>
-          
-          <div class="skills-container">
-            <!-- 第一行：向左滚动 -->
-            <div class="skills-row">
-              <div class="skills-track">
-                <span class="skill-tag">工程造价</span>
-                <span class="skill-tag">成本咨询</span>
-                <span class="skill-tag">项目管理</span>
-                <span class="skill-tag">预算编制</span>
-                <span class="skill-tag">结算编制</span>
-                <!-- 复制一遍实现无缝滚动 -->
-                <span class="skill-tag">工程造价</span>
-                <span class="skill-tag">成本咨询</span>
-                <span class="skill-tag">项目管理</span>
-                <span class="skill-tag">预算编制</span>
-                <span class="skill-tag">结算编制</span>
-              </div>
-            </div>
-            
-            <!-- 第二行：向右滚动 -->
-            <div class="skills-row">
-              <div class="skills-track skills-track-reverse">
-                <span class="skill-tag">广联达计价</span>
-                <span class="skill-tag">福莱一点通</span>
-                <span class="skill-tag">新点计价</span>
-                <span class="skill-tag">AutoCAD</span>
-                <span class="skill-tag">BIM建模</span>
-                <!-- 复制一遍 -->
-                <span class="skill-tag">广联达计价</span>
-                <span class="skill-tag">福莱一点通</span>
-                <span class="skill-tag">新点计价</span>
-                <span class="skill-tag">AutoCAD</span>
-                <span class="skill-tag">BIM建模</span>
-              </div>
-            </div>
-            
-            <!-- 第三行：向左滚动 -->
-            <div class="skills-row">
-              <div class="skills-track">
-                <span class="skill-tag">清单计价</span>
-                <span class="skill-tag">定额套用</span>
-                <span class="skill-tag">工程审计</span>
-                <span class="skill-tag">成本分析</span>
-                <span class="skill-tag">投标报价</span>
-                <!-- 复制一遍 -->
-                <span class="skill-tag">清单计价</span>
-                <span class="skill-tag">定额套用</span>
-                <span class="skill-tag">工程审计</span>
-                <span class="skill-tag">成本分析</span>
-                <span class="skill-tag">投标报价</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- 03 / RECENT POSTS 最新文章 -->
+        <!-- 最新文章 -->
         <section class="home-recent">
-          <div class="section-title">03 / 最新文章</div>
+          <div class="section-title">最新文章</div>
           <div class="recent-posts-grid">
             {{ range $index, $page := first 3 (where site.RegularPages "Type" "in" site.Params.mainSections) }}
             <div class="post-card{{ if eq $index 2 }} post-card-third{{ end }}">
@@ -99,6 +21,56 @@
               <div class="post-card-date">{{ $page.Date.Format "2006年01月02日" }}</div>
             </div>
             {{ end }}
+          </div>
+        </section>
+
+        <!-- 公告卡片 -->
+        <section class="announcement-section">
+          <div class="announcement-card">
+            <div class="announcement-icon">💭</div>
+            <div class="announcement-content">
+              <p class="announcement-text">
+              如果您寻来时页面还未盛满所有心意，不妨和角落的文字坐一会儿，它们是我一字一句攒下的细碎光阴，或许不够华丽但都在字里行间慢慢生长
+              </p>
+              <div class="announcement-meta">
+                <span class="announcement-time">- Jun Yao</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 服务案例 -->
+        <section class="services-section">
+          <div class="section-header">
+            <div class="section-title">正在服务</div>
+            <a href="/about/" class="view-more">查看更多</a>
+          </div>
+          <div class="services-grid">
+            
+            <div class="service-card">
+              <div class="service-date">24-08</div>
+              <div class="service-divider"></div>
+              <div class="service-title">青岛官路水库引黄济青连接工程</div>
+            </div>
+
+            <div class="service-card">
+              <div class="service-date">24-12</div>
+              <div class="service-divider"></div>
+              <div class="service-title">2024年高标准农田建设项目</div>
+            </div>
+
+            <div class="service-card">
+              <div class="service-date">25-04</div>
+              <div class="service-divider"></div>
+              <div class="service-title">技师学院扩容升级项目消防工程</div>
+            </div>
+
+            <div class="service-card">
+              <div class="service-date">25-06</div>
+              <div class="service-divider"></div>
+              <div class="service-title">青岛官路水库引黄济青连接工程项目金属结构工程</div>
+            </div>
+
           </div>
         </section>
 

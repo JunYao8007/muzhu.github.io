@@ -24,10 +24,15 @@ mainSections = ["posts"]
 headTitle = "muzhu"
 favicon = "/favicon.ico"
 [[params.socials]]
-name = "Posts"
+name = "文章"
 link = "/posts/"
+
 [[params.socials]]
-name = "About"
+name = "装备"
+link = "/equipment/"
+
+[[params.socials]]
+name = "关于"
 link = "/about/"
 
 

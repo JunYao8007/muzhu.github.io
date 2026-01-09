@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.LanguageCode }}" prefix="og: http://ogp.me/ns#">
+{{ partial "head.html" . }}
+
+<body>
+  <article class="posts">
+    <div class="row">
+      <div class="col-xs-12">
+        {{ partial "header.html" . }}
+        
+        <!-- 留言簿标题 -->
+        <section class="guestbook-header">
+          <h1 class="guestbook-title">留言簿</h1>
+        </section>
+
+        <!-- 加载评论按钮 -->
+        <section class="guestbook-content">
+          <div id="guestbook-comments" style="display: none;">
+           <script src="https://giscus.app/client.js"
+        data-repo="JunYao8007/blog-comments"
+        data-repo-id="R_kgDOQ2Zu7Q"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOQ2Zu7c4C0vk1"
+        data-mapping="pathname"
+        data-strict="1"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="light"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+</script>
+          </div>
+          <button id="load-comments-btn" class="load-comments-btn" onclick="loadComments()">
+            加载评论
+          </button>
+        </section>
+
+        {{ partial "footer.html" . }}
+      </div>
+    </div>
+  </article>
+
+  <script>
+    function loadComments() {
+      document.getElementById('guestbook-comments').style.display = 'block';
+      document.getElementById('load-comments-btn').style.display = 'none';
+    }
+  </script>
+
+  {{ partial "scripts.html" . }}
+</body>
+
+</html>
