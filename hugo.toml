@@ -1,8 +1,9 @@
+# 标准合法的 hugo.toml 配置（适配你的需求）
 baseURL = 'https://muzhui.cn/'
 title = 'COST ✕ JUNYAO'
 languageCode = 'zh-cn'
-canonifyURLs = true
-disablePathToLower = true
+canonifyURLs = false
+disablePathToLower = false
 
 [[menus.main]]
 name = 'Home'
@@ -40,28 +41,21 @@ weight = 30
     target = 'static'
 
 [params]
-  # --- Site Metadata ---
-  copyright = 'Copyright © 2024 COST ✕ JUNYAO'
-  
-  # --- Theme & Display Settings ---
-  primaryColor = "#000000"
-  math = true
-  
-  # --- GitHub Chart ---
-  githubUsername = "yourGithubUsername"
-  showGithubChart = true
-  
-  # --- Main Image ---
-  mainImageUrl = "img/shouye.png"
-  showMainImage = true
+copyright = 'Copyright © 2024 COST ✕ JUNYAO'
+primaryColor = "#000000"
+math = true
+githubUsername = "yourGithubUsername"
+showGithubChart = true
+mainImageUrl = "img/shouye.png"
+showMainImage = true
 
 [author]
-  name = "Jun Yao"
-  homepage = "https://muzhui.cn/"
+name = "Jun Yao"
+homepage = "https://muzhui.cn/"
 
 [taxonomies]
-  tag = 'tags'
-  category = 'categories'
+tag = 'tags'
+category = 'categories'
 
 [markup]
   [markup.goldmark]
