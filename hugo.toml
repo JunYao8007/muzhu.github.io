@@ -1,40 +1,71 @@
-baseURL = "https://muzhui.cn/"
-languageCode = "en-us"
-title = "槌"
-theme = "yinyang"
-DefaultContentLanguage = "cn"
+baseURL = 'https://muzhui.cn/'
+title = 'COST ✕ JUNYAO'
+languageCode = 'zh-cn'
+canonifyURLs = true
+disablePathToLower = true
+
+[[menus.main]]
+name = 'Home'
+pageRef = '/'
+weight = 10
+
+[[menus.main]]
+name = 'TAGS'
+pageRef = '/tags/'
+weight = 20
+
+[[menus.main]]
+name = 'ABOUT'
+pageRef = '/about/'
+weight = 30
+
+[module]
+  [[module.mounts]]
+    source = 'themes/freshpink/layouts'
+    target = 'layouts'
+  [[module.mounts]]
+    source = 'themes/freshpink/assets'
+    target = 'assets'
+  [[module.mounts]]
+    source = 'assets'
+    target = 'assets'
+  [[module.mounts]]
+    source = 'themes/freshpink/static'
+    target = 'static'
+  [[module.mounts]]
+    source = 'content'
+    target = 'content'
+  [[module.mounts]]
+    source = 'static'
+    target = 'static'
+
+[params]
+  # --- Site Metadata ---
+  copyright = 'Copyright © 2024 COST ✕ JUNYAO'
+  
+  # --- Theme & Display Settings ---
+  primaryColor = "#000000"
+  math = true
+  
+  # --- GitHub Chart ---
+  githubUsername = "yourGithubUsername"
+  showGithubChart = true
+  
+  # --- Main Image ---
+  mainImageUrl = "img/shouye.png"
+  showMainImage = true
+
+[author]
+  name = "Jun Yao"
+  homepage = "https://muzhui.cn/"
+
+[taxonomies]
+  tag = 'tags'
+  category = 'categories'
 
 [markup]
   [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true
-  [markup.highlight]
-    guessSyntax = true
-    noClasses = true
-    style = "bw"
-    tabWidth = 2
-
-[author]
-  name = "王君尧"
-  homepage = "https://muzhui.cn/"
-
-
-[params]
-mainSections = ["posts"]
-headTitle = "muzhu"
-favicon = "/favicon.ico"
-[[params.socials]]
-name = "文章"
-link = "/posts/"
-
-[[params.socials]]
-name = "装备"
-link = "/equipment/"
-
-[[params.socials]]
-name = "关于"
-link = "/about/"
-
-
-# extraCSSFiles = ["css/foo.css", "css/bar.css"]
-extraCSSFiles = []
+  [markup.tableOfContents]
+    endLevel = 3
