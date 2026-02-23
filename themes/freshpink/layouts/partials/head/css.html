@@ -1,0 +1,13 @@
+{{/* layouts/partials/head/css.html */}}
+
+{{ $main := resources.Get "css/main.css" }}
+{{ $min600 := resources.Get "css/min600.css" }}
+
+{{ $styles := slice $main $min600 | resources.Concat "css/style.css" }}
+
+{{ if hugo.IsProduction }}
+  {{ $styles = $styles | resources.Minify | resources.Fingerprint }}
+{{ end }}
+
+<link rel="stylesheet" href="{{ $styles.RelPermalink }}" 
+      {{ if hugo.IsProduction }}integrity="{{ $styles.Data.Integrity }}"{{ end }}>

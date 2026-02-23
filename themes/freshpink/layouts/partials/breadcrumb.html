@@ -1,0 +1,25 @@
+{{ $path := replaceRE "^/|/$" "" .RelPermalink }}
+
+{{ $segments := split $path "/" }}
+{{ $first := index $segments 0 }}
+
+{{ $emoji := "📁" }}
+
+{{ if eq $first "" }}
+  {{ $emoji = "🏠" }}
+{{ else if eq $first "tags" }}
+  {{ $emoji = "🏷" }}
+{{ else if eq $first "about" }}
+  {{ $emoji = "👤" }}
+{{ end }}
+
+<div class="breadcrumb">
+  {{ $emoji }}
+  {{ if eq $path "" }}
+    /home
+  {{ else if eq $first "tags" }}
+    /tags/{{ .Title }}
+  {{ else }}
+    /{{ $path }}
+  {{ end }}
+</div>

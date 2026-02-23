@@ -1,0 +1,19 @@
+{{ define "main" }}
+  {{ with .TableOfContents }}
+  <aside class="toc">
+    {{ . }}
+  </aside>
+  {{ end }}
+  <div class="featured-container">
+    {{ with .Params.featured_image }}
+      <div class="featured-image">
+        <img src="{{ . }}" alt="Featured Image for {{ $.Title }}">
+      </div>
+    {{ end }}
+    <div class="overlay-text">
+      <small>{{ .Date | time.Format "2006.01.02" }}</small>
+      <div class="singleTitle">{{ .Title }}</div>
+    </div>
+  </div>
+  {{ .Content }}
+{{ end }}
