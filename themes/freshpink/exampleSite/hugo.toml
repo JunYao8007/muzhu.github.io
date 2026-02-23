@@ -42,8 +42,7 @@ weight = 30
   mainImageUrl = "https://i.imgur.com/URQWyyY.png"
   showMainImage = true
 
-[taxonomies]
-  tag = 'tags'
+
 
 [markup]
   [markup.goldmark]

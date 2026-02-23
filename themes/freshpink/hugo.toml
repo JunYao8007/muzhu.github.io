@@ -8,10 +8,7 @@ name = 'Home'
 pageRef = '/'
 weight = 10
 
-[[menus.main]]
-name = 'TAGS'
-pageRef = '/tags/'
-weight = 20
+
 
 [[menus.main]]
 name = 'ABOUT'
@@ -42,8 +39,7 @@ weight = 30
   mainImageUrl = "https://i.imgur.com/URQWyyY.png"
   showMainImage = true
 
-[taxonomies]
-  tag = 'tags'
+
 
 [markup]
   [markup.tableOfContents]

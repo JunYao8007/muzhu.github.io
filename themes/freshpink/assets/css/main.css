@@ -499,7 +499,7 @@ ul, ol {
 	margin-top: 2rem;
 	margin-bottom: 0.5rem;
 	font-size: 0.8rem;
-	font-weight: 600;
+	font-weight: 400;
 	font-family: var(--title-font-family);
 	color: var(--text-color);
   }

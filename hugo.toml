@@ -11,8 +11,8 @@ pageRef = '/'
 weight = 10
 
 [[menus.main]]
-name = 'TAGS'
-pageRef = '/tags/'
+name = 'POST'
+pageRef = '/posts/'
 weight = 20
 
 [[menus.main]]
@@ -54,7 +54,6 @@ name = "Jun Yao"
 homepage = "https://muzhui.cn/"
 
 [taxonomies]
-tag = 'tags'
 category = 'categories'
 
 [markup]
@@ -63,3 +62,7 @@ category = 'categories'
       unsafe = true
   [markup.tableOfContents]
     endLevel = 3
+
+[pagination]
+  paginate = 10
+  paginatePath = "page"

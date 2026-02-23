@@ -11,26 +11,8 @@
   </div>
 {{ end }}
 
-{{ if and .Site.Params.showGithubChart .Site.Params.githubUsername .Site.Params.primaryColor }}
-  {{ $color := .Site.Params.primaryColor | replaceRE "^#" "" }}
-  <div class="commit">
-    <img
-      src="https://ghchart.rshah.org/{{ $color }}/{{ .Site.Params.githubUsername }}"
-    />
-  </div>
-{{ end }}
-
 <div class="home-content">
       {{ .Content }}
   </div>
-
-<div class="posts-list">
-  {{ range first 10 .Site.RegularPages }}
-    <div class="post-title">
-      <a href="{{ .RelPermalink }}">- {{ .LinkTitle }}</a>
-      <small>{{ .Date | time.Format "2006.01.02" }}</small>
-    </div>
-  {{ end }}
-</div>
 
 {{ end }}

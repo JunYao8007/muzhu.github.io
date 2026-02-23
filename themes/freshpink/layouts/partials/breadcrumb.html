@@ -7,8 +7,6 @@
 
 {{ if eq $first "" }}
   {{ $emoji = "🏠" }}
-{{ else if eq $first "tags" }}
-  {{ $emoji = "🏷" }}
 {{ else if eq $first "about" }}
   {{ $emoji = "👤" }}
 {{ end }}
@@ -17,8 +15,6 @@
   {{ $emoji }}
   {{ if eq $path "" }}
     /home
-  {{ else if eq $first "tags" }}
-    /tags/{{ .Title }}
   {{ else }}
     /{{ $path }}
   {{ end }}
