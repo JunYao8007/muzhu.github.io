@@ -942,72 +942,9 @@ function initHeaderMedia() {
         return;
     }
 
-    // 2) 单图 Live Photo：同名视频触发播放（mouseenter / touch）
-    if (isImage && !isVideo) {
-        // 生成同名视频路径（.mp4）
-        var videoSrc = single.replace(/\.(avif|jpg|jpeg|png|gif|webp)$/i, '.mp4');
-        
-        // 先检查视频是否存在，避免 404 错误
-        var video = document.createElement('video');
-        video.className = 'moments-header-live';
-        video.playsInline = true;
-        video.setAttribute('playsinline', '');
-        video.loop = true;
-        video.preload = 'metadata';
-        video.muted = false;
-        
-        var available = true;
-        video.addEventListener('error', function() {
-            available = false;
-            if (video && video.parentNode) video.parentNode.removeChild(video);
-        }, { once: true });
-        
-        video.addEventListener('canplay', function onCanPlay() {
-            video.removeEventListener('canplay', onCanPlay);
-            if (available) {
-                header.appendChild(video);
-            }
-        }, { once: true });
-        
-        video.addEventListener('play', function() {
-            video.classList.add('playing');
-        });
-        video.addEventListener('pause', function() {
-            video.classList.remove('playing');
-        });
-        
-        // 最后设置 src，避免不必要的 404 请求
-        video.src = videoSrc;
-
-        header.appendChild(video);
-
-        function playLive() {
-            if (!available) return;
-            // 交互触发播放，带声音
-            var p = video.play();
-            if (p && typeof p.catch === 'function') {
-                p.catch(function() {});
-            }
-        }
-        function stopLive() {
-            if (!available) return;
-            video.pause();
-            try { video.currentTime = 0; } catch(e) {}
-        }
-
-        header.addEventListener('mouseenter', playLive);
-        header.addEventListener('mouseleave', stopLive);
-        header.addEventListener('touchstart', function() {
-            playLive();
-        }, { passive: true });
-        header.addEventListener('touchend', function() {
-            stopLive();
-        }, { passive: true });
-        header.addEventListener('touchcancel', function() {
-            stopLive();
-        }, { passive: true });
-        return;
-    }
+    // 2) 单图 Live Photo 功能已禁用，避免无视频时产生 404 错误
+    // 如需启用，请确保 /images/header.mp4 存在，并恢复以下代码：
+    // if (isImage && !isVideo) { ... }
 }
 
 function initLivePhotoShortcodes() {
