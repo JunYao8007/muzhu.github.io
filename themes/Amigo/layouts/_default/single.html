@@ -35,13 +35,20 @@
                 </div>
 
                 {{/* 图片展示 - 详情页使用大图垂直排列 */}}
-                {{ $images := .Params.images }}
+                {{/* 优先从 Page Bundles 资源中获取图片 */}}
+                {{ $images := slice }}
+                {{ range .Resources }}
+                    {{ if or (eq .MediaType.SubType "jpeg") (eq .MediaType.SubType "png") (eq .MediaType.SubType "gif") (eq .MediaType.SubType "webp") }}
+                        {{ $images = $images | append .RelPermalink }}
+                    {{ end }}
+                {{ end }}
+                {{ $images = sort $images }}
+                
+                {{/* 如果没有 Page Bundles 图片，尝试从正文抓取 */}}
                 {{ if not $images }}
-                    {{/* 如果没有在头部写图片，就去正文里抓 */}}
                     {{ $contentForImages := .Content | replaceRE "<img[^>]*data-keep=\"1\"[^>]*>" "" }}
                     {{ $imgTags := findRE "<img[^>]+src=\"([^\"]+)\"[^>]*>" $contentForImages }}
                     {{ if $imgTags }}
-                        {{ $images = slice }}
                         {{ range $imgTags }}
                             {{ $src := replaceRE "<img[^>]+src=\"([^\"]+)\"[^>]*>" "$1" . }}
                             {{ $images = $images | append $src }}

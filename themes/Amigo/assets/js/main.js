@@ -148,11 +148,11 @@ function toggleTheme() {
     if (isDark) {
         document.documentElement.removeAttribute('data-theme');
         localStorage.setItem('theme', 'light');
-        if (typeof Qmsg !== 'undefined') Qmsg.info('切到亮色模式啦');
+        if (typeof Qmsg !== 'undefined') Qmsg.info('切到亮色模式');
     } else {
         document.documentElement.setAttribute('data-theme', 'dark');
         localStorage.setItem('theme', 'dark');
-        if (typeof Qmsg !== 'undefined') Qmsg.success('切到深色模式啦');
+        if (typeof Qmsg !== 'undefined') Qmsg.success('切到深色模式');
     }
 
     // 评论框也得跟着变色

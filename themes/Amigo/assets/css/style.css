@@ -1507,6 +1507,33 @@ body:has(.view-image) .single-header {
     display: block;
 }
 
+.gallery-grid {
+    display: grid;
+    gap: 4px;
+    max-width: 100%;
+}
+
+.gallery-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.gallery-grid.cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.gallery-item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
 
 
 /* 动态底部（时间与操作） */
