@@ -1,6 +1,6 @@
 baseURL = 'https://muzhui.cn'
 languageCode = 'zh-cn'
-title = '槌'
+title = 'COST ✕ JUNYAO'
 theme = 'Amigo'
 
 [permalinks]
@@ -25,7 +25,7 @@ theme = 'Amigo'
   # ---------------------------------------------------------------------------------------
   # 个人信息设置
   # ---------------------------------------------------------------------------------------
-  username = "槌"
+  username = "Junyao"
   # 头像地址（可以放本地路径比如 "/images/avatar.jpg"，也可以放网图链接）
   avatar = "https://laomuzhu.cn/touxiang.jpg"
   
@@ -94,6 +94,9 @@ theme = 'Amigo'
   
   # 开启图片灯箱，点击图片可以放大看
   enableLightbox = true
+  
+  # 显示位置信息
+  showLocation = true
   
   # ---------------------------------------------------------------------------------------
   # 社交链接（想加几个加几个）
