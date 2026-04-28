@@ -946,27 +946,38 @@ function initHeaderMedia() {
     if (isImage && !isVideo) {
         // 生成同名视频路径（.mp4）
         var videoSrc = single.replace(/\.(avif|jpg|jpeg|png|gif|webp)$/i, '.mp4');
+        
+        // 先检查视频是否存在，避免 404 错误
         var video = document.createElement('video');
         video.className = 'moments-header-live';
-        video.src = videoSrc;
         video.playsInline = true;
         video.setAttribute('playsinline', '');
         video.loop = true;
         video.preload = 'metadata';
-        // 允许声音，因交互触发，不受自动播放限制；如需静音可改为 video.muted = true;
         video.muted = false;
-
+        
         var available = true;
         video.addEventListener('error', function() {
             available = false;
             if (video && video.parentNode) video.parentNode.removeChild(video);
         }, { once: true });
+        
+        video.addEventListener('canplay', function onCanPlay() {
+            video.removeEventListener('canplay', onCanPlay);
+            if (available) {
+                header.appendChild(video);
+            }
+        }, { once: true });
+        
         video.addEventListener('play', function() {
             video.classList.add('playing');
         });
         video.addEventListener('pause', function() {
             video.classList.remove('playing');
         });
+        
+        // 最后设置 src，避免不必要的 404 请求
+        video.src = videoSrc;
 
         header.appendChild(video);
 
