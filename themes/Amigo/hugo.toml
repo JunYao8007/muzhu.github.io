@@ -1,6 +1,6 @@
-baseURL = 'https://muzhui.cn'
+baseURL = 'https://example.com'
 languageCode = 'zh-cn'
-title = '槌'
+title = '我的朋友圈'
 theme = 'Amigo'
 
 [permalinks]
@@ -25,12 +25,12 @@ theme = 'Amigo'
   # ---------------------------------------------------------------------------------------
   # 个人信息设置
   # ---------------------------------------------------------------------------------------
-  username = "槌"
+  username = "您的名字"
   # 头像地址（可以放本地路径比如 "/images/avatar.jpg"，也可以放网图链接）
-  avatar = "https://laomuzhu.cn/touxiang.jpg"
+  avatar = "/images/avatar.jpg"
   
   # 个人简介，会显示在头像旁边
-  description = "造价工程师 现居山东青岛"
+  description = "这是我的个人动态展示页"
   
   # 首页最上面那张大图
   cover = "/images/header.png"
@@ -41,7 +41,7 @@ theme = 'Amigo'
   favicon = "favicon.ico"
   
   # 页面最底部的文字，支持写 HTML 代码
-  # footerText = ""
+  footerText = ""
 
   # ICP 备案号，要是没有就注掉
   # icp = "京ICP备12345678号"
@@ -53,8 +53,8 @@ theme = 'Amigo'
   commentMode = "none"
 
   # 1. Artalk 评论（官方文档：https://artalk.js.org/）
-  # artalkServer = "https://your-artalk-server.com"
-  # artalkSite = "您的站点名称"
+  artalkServer = "https://your-artalk-server.com"
+  artalkSite = "您的站点名称"
   # 是否开启底部评论弹幕（true 开启，false 关闭）
   enableDanmaku = true
 
