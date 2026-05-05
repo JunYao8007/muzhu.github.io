@@ -64,7 +64,7 @@
     --shadow-text: 0 1px 1px rgba(0, 0, 0, 0.5);
 
     /* 布局参数 */
-    --max-width: 680px;
+    --max-width: 600px;
 }
 
 /* 深色模式变量 */
@@ -654,7 +654,7 @@ blockquote {
     position: relative;
     display: flex;
     align-items: flex-end;
-    justify-content: flex-end;
+    justify-content: space-between;
     overflow: hidden;
 }
 
@@ -674,7 +674,7 @@ blockquote {
 .archive-author-avatar img {
     width: 56px;
     height: 56px;
-    border-radius: 50%;
+    border-radius: 20%;
     object-fit: cover;
     box-shadow: 0 4px 16px rgba(0,0,0,0.4);
 }
