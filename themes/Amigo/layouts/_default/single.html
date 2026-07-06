@@ -74,6 +74,45 @@
                 </div>
                 {{ end }}
 
+                {{/* 视频展示 - 详情页 */}}
+                {{ $videos := slice }}
+                {{ range .Resources }}
+                    {{ if eq .MediaType.MainType "video" }}
+                        {{ $videos = $videos | append .RelPermalink }}
+                    {{ end }}
+                {{ end }}
+                {{ $videos = sort $videos }}
+                {{ if $videos }}
+                {{ $currentPage := . }}
+                <div class="video-gallery">
+                    {{ range $videos }}
+                    {{ $videoSrc := . }}
+                    {{ $poster := "" }}
+                    {{ $videoBase := replaceRE "\\.[^.]+$" "" (path.Base .) }}
+                    {{ with $currentPage.Resources.GetMatch (printf "%s.*" $videoBase) }}
+                        {{ $poster = .RelPermalink }}
+                    {{ end }}
+                    {{ if not $poster }}
+                        {{ range $currentPage.Resources }}
+                            {{ if and (eq .MediaType.MainType "image") (not $poster) }}
+                                {{ $poster = .RelPermalink }}
+                            {{ end }}
+                        {{ end }}
+                    {{ end }}
+                    <div class="video-card" data-video-src="{{ $videoSrc }}">
+                        <div class="video-cover">
+                            <img class="video-poster" src="{{ $poster }}" alt="video" loading="lazy">
+                            <div class="video-play-overlay">
+                                <div class="video-play-btn">
+                                    <i class="ri-play-fill"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{ end }}
+                </div>
+                {{ end }}
+
             </div>
         </article>
 

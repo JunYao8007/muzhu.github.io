@@ -4,7 +4,7 @@ title = 'COST ✕ JUNYAO'
 theme = 'Amigo'
 
 [permalinks]
-  posts = "/:filename.html"
+  posts = "/:contentbasename/"
 
 [[menu.main]]
   name = "首页"
