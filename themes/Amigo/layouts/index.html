@@ -57,9 +57,16 @@
             {{ $currentPage := . }}
             
             {{/* 左侧：头像 */}}
+            {{ $avatarSrc := .Params.avatar | default $.Site.Params.avatar | default ( "images/avatar.jpg" | relURL ) }}
+            {{ if and $isAd .Params.logo }}
+                {{ $logoRes := .Resources.GetMatch .Params.logo }}
+                {{ if $logoRes }}
+                    {{ $avatarSrc = $logoRes.RelPermalink }}
+                {{ end }}
+            {{ end }}
             <aside class="moment-aside">
                 <a class="avatar-link" href="{{ "posts" | relURL }}?author={{ .Params.author | default $.Site.Params.username }}">
-                    <img class="avatar-img" src="{{ .Params.avatar | default $.Site.Params.avatar | default ( "images/avatar.jpg" | relURL ) }}" alt="User" loading="lazy">
+                    <img class="avatar-img" src="{{ $avatarSrc }}" alt="User" loading="lazy">
                 </a>
             </aside>
 
@@ -84,11 +91,14 @@
                 </div>
 
                 {{/* 图片画廊（九宫格） */}}
-                {{/* 优先使用 Page Bundles 资源中的图片 */}}
+                {{/* 优先使用 Page Bundles 资源中的图片；广告贴中 logo 已作为头像，不再显示在大图 */}}
+                {{ $logoName := .Params.logo }}
                 {{ $images := slice }}
                 {{ range .Resources }}
                     {{ if or (eq .MediaType.SubType "jpeg") (eq .MediaType.SubType "png") (eq .MediaType.SubType "gif") (eq .MediaType.SubType "webp") }}
-                        {{ $images = $images | append .RelPermalink }}
+                        {{ if not (and $isAd $logoName (eq .Name $logoName)) }}
+                            {{ $images = $images | append .RelPermalink }}
+                        {{ end }}
                     {{ end }}
                 {{ end }}
                 {{ $images = sort $images }}
@@ -140,6 +150,14 @@
                         </div>
                     {{ end }}
                 </div>
+                {{ end }}
+
+                {{/* 广告链接（在时间上方） */}}
+                {{ if and $isAd .Params.adlink }}
+                <a class="moment-ad-link" href="{{ .Params.adlink | safeURL }}" target="_blank" rel="noopener nofollow">
+                    <i class="ri-link"></i>
+                    {{ .Params.cta | default "Buy now" }}
+                </a>
                 {{ end }}
 
                 {{/* 时间、地点与操作按钮 */}}

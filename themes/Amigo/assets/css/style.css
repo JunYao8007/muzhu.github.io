@@ -608,20 +608,40 @@ blockquote {
     margin-top: 0;
     margin-bottom: 4px;
     line-height: 1.2;
-    display: inline-flex;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 6px;
 }
 
 .moment-ad-badge {
-    background: #ff3b30;
-    color: #fff;
+    font-size: 11px;
+    line-height: 1;
+    color: var(--text-link);
+    background: var(--bg-body);
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.moment-ad-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 12px;
-    font-weight: 600;
-    height: 18px;
-    line-height: 18px;
-    padding: 0 6px;
-    border-radius: 999px;
+    color: var(--text-link);
+    text-decoration: none;
+    margin-bottom: 6px;
+}
+
+.moment-ad-link i {
+    font-size: 14px;
+    transform: rotate(-45deg);
+}
+
+.moment-ad-link:hover {
+    opacity: 0.8;
 }
 
 .moment-author a {
@@ -1394,12 +1414,13 @@ body:has(.view-image) .single-header {
     position: absolute;
     right: 14px;
     top: 14px;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1;
-    color: var(--text-muted);
-    background: var(--bg-active);
-    border-radius: 999px;
-    padding: 4px 8px;
+    color: var(--text-link);
+    background: var(--bg-body);
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-weight: 500;
 }
 
 .ad-brand-row {
