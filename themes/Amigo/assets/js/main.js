@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
     initArchiveFilter();
     initHomeSearch();
     initDanmaku();
+    initVoiceMessages();
 });
 
 // 页面跳转前，先把 Artalk 评论实例给销毁掉，省得占内存
@@ -42,6 +43,7 @@ document.addEventListener("pjax:complete", function() {
     initArchiveFilter();
     initHomeSearch();
     initDanmaku();
+    initVoiceMessages();
 });
 
 function initMenu() {
@@ -173,12 +175,7 @@ function toggleTheme() {
     }
 }
 
-// 点击头像就能切换主题，挺方便的
-document.addEventListener('click', (e) => {
-    if (e.target.closest('.header-avatar')) {
-        toggleTheme();
-    }
-});
+
 
 // 监听系统主题变化，要是用户没手动改过，就跟着系统走
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
@@ -1294,13 +1291,29 @@ function initMoments() {
                 textWrapper.insertAdjacentElement('afterend', liveWrap);
             }
 
+            // 检查是否有语音消息：取消折叠
+            const voiceMsgs = textDiv.querySelectorAll('.amigo-voice-bubble');
+            if (voiceMsgs.length) {
+                textDiv.classList.add('has-voice');
+                textWrapper.classList.add('has-voice');
+            }
+
             // Reset state for re-init
             textDiv.classList.add('is-collapsed');
             toggleBtn.style.display = 'none';
             toggleBtn.innerText = '全文';
 
+            // 如果有语音消息，不需要折叠
+            const hasSpecialContent = voiceMsgs.length > 0;
+
             // Check overflow after a small delay to ensure rendering
             setTimeout(() => {
+                if (hasSpecialContent) {
+                    // 不折叠，直接展开
+                    textDiv.classList.remove('is-collapsed');
+                    toggleBtn.style.display = 'none';
+                    return;
+                }
                 const isOverflowing = textDiv.scrollHeight > textDiv.clientHeight;
                 if (isOverflowing) {
                     toggleBtn.style.display = 'inline-block';
@@ -1354,5 +1367,91 @@ function initMoments() {
                 popover.classList.toggle('is-visible');
             };
         }
+    });
+}
+
+/* ==========================================================================
+   微信语音消息功能 (voice shortcode)
+   ========================================================================== */
+
+function initVoiceMessages() {
+    document.querySelectorAll('.amigo-voice-bubble').forEach(el => {
+        if (el.dataset.voiceInit) return;
+        el.dataset.voiceInit = 'true';
+
+        const src = el.dataset.src;
+        if (!src) return;
+
+        const durationEl = el.querySelector('.amigo-voice-duration');
+        let audio = null;
+        let isPlaying = false;
+        let totalSeconds = null;
+
+        // 更新倒计时显示
+        const updateCountdown = () => {
+            if (!audio || !totalSeconds) return;
+            const remaining = Math.max(0, totalSeconds - Math.floor(audio.currentTime));
+            durationEl.textContent = remaining + '\u2033';
+        };
+
+        // 立即加载音频获取真实时长
+        const probe = new Audio();
+        probe.preload = 'metadata';
+        probe.addEventListener('loadedmetadata', () => {
+            if (probe.duration && !isNaN(probe.duration)) {
+                totalSeconds = Math.round(probe.duration);
+                durationEl.textContent = totalSeconds + '\u2033';
+            }
+        });
+        probe.src = src;
+
+        const stop = () => {
+            if (el._voiceTimer) {
+                clearInterval(el._voiceTimer);
+                el._voiceTimer = null;
+            }
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            isPlaying = false;
+            el.classList.remove('is-playing');
+            // 恢复显示总时长
+            if (totalSeconds) {
+                durationEl.textContent = totalSeconds + '\u2033';
+            }
+        };
+
+        el.addEventListener('click', () => {
+            if (!audio) {
+                audio = new Audio(src);
+                audio.addEventListener('ended', stop);
+            }
+
+            if (isPlaying) {
+                stop();
+            } else {
+                document.querySelectorAll('.amigo-voice-bubble.is-playing').forEach(other => {
+                    if (other !== el) {
+                        if (other._voiceTimer) {
+                            clearInterval(other._voiceTimer);
+                            other._voiceTimer = null;
+                        }
+                        other.classList.remove('is-playing');
+                        if (other._voiceAudio) {
+                            other._voiceAudio.pause();
+                            other._voiceAudio.currentTime = 0;
+                        }
+                    }
+                });
+                audio.play().catch(() => {});
+                isPlaying = true;
+                el.classList.add('is-playing');
+                el._voiceAudio = audio;
+                // 启动倒计时更新
+                updateCountdown();
+                el._voiceTimer = setInterval(updateCountdown, 200);
+            }
+        });
     });
 }

@@ -11,9 +11,9 @@ adlink = 'https://laomuzhu.cn'
 logo = 'logo.png'
 +++
 
-The platform is turning into a "square"
+The platform is turning into a “square”
 
-And independent websites are becoming "rooms" again
+And independent websites are becoming “rooms” again
 
 The square is suitable for exposure, while the room is suitable for leaving behind the genuine
 
