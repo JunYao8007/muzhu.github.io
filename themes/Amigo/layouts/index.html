@@ -130,7 +130,7 @@
                                         {{ $imgSrc = .RelPermalink }}
                                     {{ end }}
                                 {{ end }}
-                                <img src="{{ $imgSrc }}" alt="Image" loading="lazy">
+                                <img src="{{ $imgSrc }}" alt="Image" decoding="async">
                             {{ end }}
                         </div>
                     {{ else }}
@@ -144,7 +144,7 @@
                                     {{ end }}
                                 {{ end }}
                                 <div class="gallery-item">
-                                    <img src="{{ $imgSrc }}" alt="Image" loading="lazy">
+                                    <img src="{{ $imgSrc }}" alt="Image" decoding="async">
                                 </div>
                             {{ end }}
                         </div>
