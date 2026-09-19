@@ -97,28 +97,14 @@
 <body>
     <!-- 整个页面的主包裹层 -->
     <div class="main-wrapper">
-        <!-- 首页的页眉（带菜单按钮） -->
+        <!-- 首页的页眉（搜索已移入个人资料卡片） -->
         {{ if .IsHome }}
         <header class="home-header">
-            
-            <div class="header-center">
-                {{ if ne .Site.Params.enableSearch false }}
-                <div class="header-search">
-                    <i class="ri-search-line"></i>
-                    <input type="text" id="home-search-input" placeholder="搜索">
-                    <button id="home-search-clear" class="nav-btn" aria-label="清除">
-                        <i class="ri-close-line"></i>
-                    </button>
-                </div>
-                {{ end }}
-            </div>
+            <div class="header-center"></div>
             <div class="header-actions">
                 <button class="nav-btn btn-back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="回到顶部">
                     <i class="ri-arrow-up-line"></i>
                 </button>
-                {{ if ne .Site.Params.enableDarkMode false }}
-
-                {{ end }}
             </div>
         </header>
         {{ end }}
@@ -131,6 +117,60 @@
 
     {{ if and (not .IsHome) .Site.Params.artalkServer (eq .Site.Params.commentMode "artalk") (ne .Site.Params.enableDanmaku false) }}
       <div id="danmaku-root" class="danmaku-root"></div>
+    {{ end }}
+
+    {{ if .IsHome }}
+    <!-- 个人资料卡片弹窗（双击头像触发，含搜索） -->
+    <div id="profile-overlay" class="profile-overlay">
+        <div class="profile-card" id="profile-card">
+            <div class="profile-card-header">
+                <span class="profile-card-title"></span>
+                <button class="profile-close" id="profile-close" aria-label="关闭">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="profile-card-body">
+                <img class="profile-avatar" src="{{ .Site.Params.avatar | default ( "images/avatar.jpg" | relURL ) }}" alt="Avatar">
+                <h2 class="profile-name">{{ .Site.Params.username | default .Site.Title }}</h2>
+                <p class="profile-bio">{{ .Site.Params.description }}</p>
+            </div>
+            <div class="profile-card-list">
+                <button class="profile-row" id="profile-search-btn" type="button">
+                    <i class="ri-search-line"></i>
+                    <span>搜索动态</span>
+                    <i class="ri-arrow-right-s-line row-arrow"></i>
+                </button>
+                <a class="profile-row" href="{{ "friends" | relURL }}">
+                    <i class="ri-links-line"></i>
+                    <span>友情链接</span>
+                    <i class="ri-arrow-right-s-line row-arrow"></i>
+                </a>
+                <a class="profile-row" href="{{ "index.xml" | relURL }}" target="_blank" rel="noopener">
+                    <i class="ri-rss-line"></i>
+                    <span>RSS 订阅</span>
+                    <i class="ri-arrow-right-s-line row-arrow"></i>
+                </a>
+            </div>
+            <div class="profile-card-footer">© {{ now.Year }} · {{ .Site.Params.username | default .Site.Title }} · Powered by Hugo</div>
+
+            <!-- 搜索视图（点"搜索动态"后卡片切换到此视图） -->
+            <div class="profile-search-view" id="profile-search-view">
+                <div class="profile-search-bar">
+                    <button class="profile-search-back" id="profile-search-back" aria-label="返回">
+                        <i class="ri-arrow-left-line"></i>
+                    </button>
+                    <div class="profile-search-input-wrap">
+                        <i class="ri-search-line"></i>
+                        <input type="text" id="profile-search-input" placeholder="" autocomplete="off">
+                        <button id="profile-search-clear" aria-label="清除" style="display: none;">
+                            <i class="ri-close-circle-fill"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="profile-search-results" id="profile-search-results"></div>
+            </div>
+        </div>
+    </div>
     {{ end }}
 
     <!-- Full Screen Menu Overlay -->

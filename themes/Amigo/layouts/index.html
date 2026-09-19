@@ -25,14 +25,14 @@
         <div id="danmaku-root" class="danmaku-root"></div>
         {{ end }}
     </header>
-    
+
     {{/* 个人签名（放在封面图下面） */}}
     <div class="header-signature">
         {{ .Site.Params.description }}
     </div>
 
-    {{/* 动态列表（信息流） */}}
-    <main class="moments-feed">
+    {{/* 动态列表（信息流，JS 无限滚动分批加载） */}}
+    <main class="moments-feed feed-infinite" data-feed-page-size="{{ .Site.Params.feedPageSize | default 10 }}">
         {{ $pages := where .Site.RegularPages "Section" "posts" }}
         {{ $items := slice }}
         {{ range $pages }}

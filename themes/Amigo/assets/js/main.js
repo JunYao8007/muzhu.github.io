@@ -11,9 +11,10 @@ document.addEventListener("DOMContentLoaded", function() {
     initHeaderMedia();
     initLivePhotoShortcodes();
     initArchiveFilter();
-    initHomeSearch();
     initDanmaku();
     initVoiceMessages();
+    initInfiniteFeed();
+    initProfileCard();
 });
 
 // 页面跳转前，先把 Artalk 评论实例给销毁掉，省得占内存
@@ -41,10 +42,307 @@ document.addEventListener("pjax:complete", function() {
     initHeaderMedia();
     initLivePhotoShortcodes();
     initArchiveFilter();
-    initHomeSearch();
     initDanmaku();
     initVoiceMessages();
+    initInfiniteFeed();
+    initProfileCard();
 });
+
+/* ========== 双击头像弹出个人资料卡片（含卡片内搜索） ========== */
+function initProfileCard() {
+    var avatar = document.querySelector('.moments-header .header-avatar');
+    var overlay = document.getElementById('profile-overlay');
+    var card = document.getElementById('profile-card');
+    if (!avatar || !overlay || !card || avatar.dataset.profileInit) return;
+    avatar.dataset.profileInit = '1';
+
+    var lastTap = 0;
+    var searchIndex = null;   // 搜索索引，首次搜索时构建
+    var searchTimer = null;
+
+    /* ---------- 弹窗开关 ---------- */
+    function open() {
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function close() {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        // 关闭时顺便退出搜索视图
+        setTimeout(exitSearch, 300);
+    }
+
+    avatar.addEventListener('click', function(e) {
+        e.preventDefault();
+        var now = Date.now();
+        if (now - lastTap < 350) {
+            open();
+            lastTap = 0;
+        } else {
+            lastTap = now;
+        }
+    });
+
+    var closeBtn = document.getElementById('profile-close');
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) close();
+    });
+    if (!window.__amigoProfileEsc) {
+        window.__amigoProfileEsc = true;
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && overlay.classList.contains('active')) {
+                // 搜索视图里先退搜索，再按才关卡片
+                if (card.classList.contains('is-searching')) {
+                    exitSearch();
+                } else {
+                    close();
+                }
+            }
+        });
+    }
+
+    /* ---------- 卡片内搜索 ---------- */
+    var searchBtn = document.getElementById('profile-search-btn');
+    var searchView = document.getElementById('profile-search-view');
+    var searchInput = document.getElementById('profile-search-input');
+    var searchClear = document.getElementById('profile-search-clear');
+    var searchBack = document.getElementById('profile-search-back');
+    var searchResults = document.getElementById('profile-search-results');
+    if (!searchBtn || !searchView || !searchInput || !searchResults) return;
+
+    // 从页面 DOM 构建搜索索引（无限滚动只是隐藏，卡片都在 DOM 里）
+    function buildIndex() {
+        var cards = document.querySelectorAll('.moments-feed .moment-card');
+        var list = [];
+        Array.prototype.forEach.call(cards, function(el) {
+            var textEl = el.querySelector('.moment-text');
+            var timeEl = el.querySelector('.moment-time');
+            var authorEl = el.querySelector('.moment-author');
+            var locEl = el.querySelector('.moment-location');
+            var tagsEl = el.querySelector('.moment-tags');
+            var linkEl = el.querySelector('.action-wrapper a[href]');
+            list.push({
+                el: el,
+                text: textEl ? textEl.textContent.replace(/\s+/g, ' ').trim() : '',
+                time: timeEl ? timeEl.textContent.trim() : '',
+                author: authorEl ? authorEl.textContent.trim() : '',
+                location: locEl ? locEl.textContent.trim() : '',
+                tags: tagsEl ? tagsEl.textContent.trim() : '',
+                url: linkEl ? linkEl.getAttribute('href') : ('#' + el.id)
+            });
+        });
+        return list;
+    }
+
+    function enterSearch(prefill) {
+        searchIndex = searchIndex || buildIndex();
+        // 关键：先把搜索视图锁成资料视图同样的高度，卡片就不会跳动、重新居中
+        var cardH = card.offsetHeight;
+        var maxH = Math.round(window.innerHeight * 0.8);
+        searchView.style.height = Math.min(cardH, maxH) + 'px';
+        card.classList.add('is-searching');
+        searchInput.value = prefill || '';
+        runSearch();
+        setTimeout(function() { searchInput.focus(); }, 120);
+    }
+    function exitSearch() {
+        card.classList.remove('is-searching');
+        searchView.style.height = '';
+        searchInput.value = '';
+        searchClear.style.display = 'none';
+        searchResults.innerHTML = '';
+    }
+
+    // 点击"友情链接 / RSS"等链接行时，自动关闭卡片（PJAX 跳转不会关遮罩）
+    var linkRows = card.querySelectorAll('.profile-row[href]');
+    Array.prototype.forEach.call(linkRows, function(a) {
+        a.addEventListener('click', function() { close(); });
+    });
+
+    // 生成高亮片段：截取关键词前后各约 28 个字符
+    function snippet(text, query) {
+        var idx = text.toLowerCase().indexOf(query.toLowerCase());
+        if (idx === -1) return escapeHtml(text.slice(0, 60)) + (text.length > 60 ? '…' : '');
+        var start = Math.max(0, idx - 28);
+        var end = Math.min(text.length, idx + query.length + 32);
+        var prefix = start > 0 ? '…' : '';
+        var suffix = end < text.length ? '…' : '';
+        var raw = text.slice(start, idx) + '\x01' + text.slice(idx, idx + query.length) + '\x02' + text.slice(idx + query.length, end);
+        return escapeHtml(prefix + raw + suffix)
+            .replace('\x01', '<mark>').replace('\x02', '</mark>');
+    }
+    function escapeHtml(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function runSearch() {
+        var query = searchInput.value.trim().toLowerCase();
+        searchClear.style.display = query ? 'flex' : 'none';
+        if (!query) {
+            searchResults.innerHTML = '<div class="profile-search-tip"><i class="ri-search-eye-line"></i>输入关键词，搜索动态内容、标签或地点</div>';
+            return;
+        }
+        var hits = [];
+        searchIndex.forEach(function(item) {
+            if (item.text.toLowerCase().indexOf(query) !== -1 ||
+                item.author.toLowerCase().indexOf(query) !== -1 ||
+                item.location.toLowerCase().indexOf(query) !== -1 ||
+                item.tags.toLowerCase().indexOf(query) !== -1 ||
+                item.time.toLowerCase().indexOf(query) !== -1) {
+                hits.push(item);
+            }
+        });
+        if (!hits.length) {
+            searchResults.innerHTML = '<div class="profile-search-tip"><i class="ri-emotion-sad-line"></i>未找到相关动态</div>';
+            return;
+        }
+        var html = '<div class="profile-search-count">找到 ' + hits.length + ' 条动态</div>';
+        hits.slice(0, 20).forEach(function(item) {
+            var where = item.location ? '<span class="sr-loc"><i class="ri-map-pin-line"></i>' + escapeHtml(item.location) + '</span>' : '';
+            html += '<button class="profile-search-item" type="button" data-target="' + item.el.id + '">' +
+                '<span class="sr-time">' + escapeHtml(item.time) + where + '</span>' +
+                '<span class="sr-text">' + snippet(item.text, query) + '</span>' +
+                '</button>';
+        });
+        searchResults.innerHTML = html;
+    }
+
+    // 点击结果：关卡片 → 展开到目标动态 → 平滑滚动 + 闪烁高亮
+    searchResults.addEventListener('click', function(e) {
+        var item = e.target.closest ? e.target.closest('.profile-search-item') : null;
+        if (!item) return;
+        var targetId = item.getAttribute('data-target');
+        var target = document.getElementById(targetId);
+        close();
+        if (!target) return;
+        // 无限滚动隐藏的卡片，展开到它所在批次
+        var feed = document.querySelector('.moments-feed.feed-infinite');
+        if (feed && feed.__amigoInfinite) {
+            var st = feed.__amigoInfinite;
+            var all = Array.prototype.slice.call(feed.querySelectorAll('.moment-card'));
+            var idx = all.indexOf(target);
+            if (idx !== -1 && idx >= st.shown) {
+                st.shown = Math.min(idx + 1, all.length);
+                st.hide();
+            }
+        }
+        setTimeout(function() {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.classList.add('moment-flash');
+            setTimeout(function() { target.classList.remove('moment-flash'); }, 2400);
+        }, 150);
+    });
+
+    searchBtn.addEventListener('click', function() { enterSearch(''); });
+    searchBack.addEventListener('click', exitSearch);
+    if (searchClear) searchClear.addEventListener('click', function() {
+        searchInput.value = '';
+        runSearch();
+        searchInput.focus();
+    });
+    searchInput.addEventListener('input', function() {
+        if (searchTimer) clearTimeout(searchTimer);
+        searchTimer = setTimeout(runSearch, 120);
+    });
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') e.preventDefault();
+    });
+
+    // 点击首页动态里的标签/地点 → 打开卡片搜索
+    var feed = document.querySelector('.moments-feed');
+    if (feed) {
+        feed.addEventListener('click', function(e) {
+            var isTag = e.target.classList.contains('moment-tag');
+            var isLoc = e.target.classList.contains('moment-location');
+            if (!isTag && !isLoc) return;
+            e.preventDefault();
+            e.stopPropagation();
+            var word = e.target.textContent.replace('#', '').trim();
+            open();
+            setTimeout(function() { enterSearch(word); }, 200);
+        });
+    }
+}
+
+/* ========== 首页无限滚动加载 ========== */
+function initInfiniteFeed() {
+    var feed = document.querySelector('.moments-feed.feed-infinite');
+    if (!feed || feed.dataset.infiniteInit) return;
+    feed.dataset.infiniteInit = '1';
+
+    var cards = Array.prototype.slice.call(feed.querySelectorAll('.moment-card'));
+    var pageSize = parseInt(feed.dataset.feedPageSize, 10) || 10;
+    if (cards.length <= pageSize) return;
+
+    var state = {
+        shown: pageSize,
+        observer: null,
+        timer: null
+    };
+
+    // 底部哨兵：滑到附近显示"正在加载中"，然后展示下一批
+    var sentinel = document.createElement('div');
+    sentinel.className = 'feed-sentinel';
+    sentinel.innerHTML = '<i class="ri-loader-4-line"></i><span>正在加载中</span>';
+
+    function hideRest() {
+        cards.forEach(function(card, i) {
+            card.style.display = i < state.shown ? '' : 'none';
+        });
+    }
+
+    function finish() {
+        if (state.observer) state.observer.disconnect();
+        if (sentinel.parentNode) sentinel.parentNode.removeChild(sentinel);
+        var end = document.createElement('div');
+        end.className = 'feed-end';
+        end.innerHTML = '<span>— 已经到底啦 —</span>';
+        feed.appendChild(end);
+    }
+
+    function update() {
+        // 无论哪个分支，都先把该显示的文章显示出来
+        hideRest();
+        if (state.shown >= cards.length) {
+            finish();
+        } else {
+            feed.appendChild(sentinel);
+        }
+    }
+
+    state.observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (!entry.isIntersecting || state.timer) return;
+            sentinel.classList.add('is-loading');
+            state.timer = setTimeout(function() {
+                state.timer = null;
+                sentinel.classList.remove('is-loading');
+                // 最后一批只加载到实际数量，不会超出
+                state.shown = Math.min(state.shown + pageSize, cards.length);
+                update();
+            }, 500);
+        });
+    }, { rootMargin: '0px 0px 300px 0px' });
+
+    state.hide = hideRest;
+    state.sentinel = sentinel;
+    feed.__amigoInfinite = state;
+    update();
+    // 关键：把哨兵元素挂到观察器上，滑到附近才会触发加载
+    state.observer.observe(sentinel);
+}
+
+// 搜索清空后，恢复"只显示已加载批次"的状态
+function restoreFeedLazy() {
+    var feeds = document.querySelectorAll('.moments-feed.feed-infinite');
+    Array.prototype.forEach.call(feeds, function(feed) {
+        var st = feed.__amigoInfinite;
+        if (!st) return;
+        if (st.sentinel && st.sentinel.parentNode) st.sentinel.style.display = '';
+        st.hide();
+    });
+}
 
 function initMenu() {
     // 选一下菜单开关和遮罩层
@@ -209,112 +507,6 @@ function initLightbox() {
     }
 }
 
-function initHomeSearch() {
-    var header = document.querySelector('.home-header');
-    if (!header) return;
-    var input = document.getElementById('home-search-input');
-    var clearBtn = document.getElementById('home-search-clear');
-    if (!input || !clearBtn) return;
-
-    var cards = Array.prototype.slice.call(document.querySelectorAll('.moments-feed .moment-card'));
-    var timer = null;
-
-    function applyFilter(q) {
-        var query = (q || '').trim().toLowerCase();
-        var anyVisible = false;
-        cards.forEach(function(card) {
-            var authorEl = card.querySelector('.moment-author');
-            var textEl = card.querySelector('.moment-text');
-            var timeEl = card.querySelector('.moment-time');
-            var locationEl = card.querySelector('.moment-location');
-            var tagsEl = card.querySelector('.moment-tags');
-            
-            var author = authorEl ? authorEl.textContent.trim().toLowerCase() : '';
-            var text = textEl ? textEl.textContent.trim().toLowerCase() : '';
-            var time = timeEl ? timeEl.textContent.trim().toLowerCase() : '';
-            var location = locationEl ? locationEl.textContent.trim().toLowerCase() : '';
-            var tags = tagsEl ? tagsEl.textContent.trim().toLowerCase() : '';
-            
-            var hit = !query || 
-                      author.indexOf(query) !== -1 || 
-                      text.indexOf(query) !== -1 || 
-                      time.indexOf(query) !== -1 || 
-                      location.indexOf(query) !== -1 ||
-                      tags.indexOf(query) !== -1;
-            
-            card.style.display = hit ? '' : 'none';
-            if (hit) anyVisible = true;
-        });
-        clearBtn.style.display = input.value ? 'flex' : 'none';
-        var emptyTip = document.getElementById('home-search-empty');
-        if (!emptyTip) {
-            emptyTip = document.createElement('div');
-            emptyTip.id = 'home-search-empty';
-            emptyTip.style.margin = '10px 0';
-            emptyTip.style.color = 'var(--text-muted)';
-            emptyTip.style.textAlign = 'center';
-            emptyTip.style.display = 'none';
-            var feed = document.querySelector('.moments-feed');
-            if (feed) feed.prepend(emptyTip);
-        }
-        emptyTip.textContent = '未找到匹配的内容';
-        emptyTip.style.display = anyVisible ? 'none' : 'block';
-    }
-
-    var newInput = input.cloneNode(true);
-    input.parentNode.replaceChild(newInput, input);
-    input = newInput;
-
-    var newClear = clearBtn.cloneNode(true);
-    clearBtn.parentNode.replaceChild(newClear, clearBtn);
-    clearBtn = newClear;
-
-    input.addEventListener('input', function() {
-        if (timer) clearTimeout(timer);
-        var value = input.value;
-        timer = setTimeout(function() { applyFilter(value); }, 150);
-    });
-
-    input.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            input.value = '';
-            applyFilter('');
-        }
-    });
-
-    clearBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        input.value = '';
-        applyFilter('');
-    });
-
-    // 监听标签点击，自动填充搜索框并过滤
-    var feed = document.querySelector('.moments-feed');
-    if (feed) {
-        feed.addEventListener('click', function(e) {
-            // 点击标签
-            if (e.target.classList.contains('moment-tag')) {
-                e.preventDefault();
-                e.stopPropagation();
-                var tagName = e.target.textContent.replace('#', '').trim();
-                input.value = tagName;
-                applyFilter(tagName);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-            // 点击地点
-            else if (e.target.classList.contains('moment-location')) {
-                e.preventDefault();
-                e.stopPropagation();
-                var locName = e.target.textContent.trim();
-                input.value = locName;
-                applyFilter(locName);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        });
-    }
-
-    applyFilter('');
-}
 function initArchiveFilter() {
     var container = document.querySelector('.archive-view');
     if (!container) return;
