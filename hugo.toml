@@ -21,6 +21,11 @@ theme = 'Amigo'
   url = "/friends.html"
   weight = 3
 
+[[menu.main]]
+  name = "旅行地图"
+  url = "/travel.html"
+  weight = 4
+
 [params]
   # ---------------------------------------------------------------------------------------
   # 个人信息设置

@@ -1,0 +1,118 @@
+{{ define "main" }}
+    {{ partial "header-page.html" . }}
+
+    {{/* 汇总去过的城市：
+         type=post  → 有文章定位的城市（青色）
+         type=manual→ 手动在 data/travel.yml 添加、还没有文章的城市（橙色） */}}
+    {{ $cities := dict }}
+    {{ range .Site.RegularPages }}
+        {{ with .Params.location }}
+            {{ $name := trim (index (split . "·") 0) " " }}
+            {{ if $name }}
+                {{ $prev := index $cities $name }}
+                {{ $cnt := 0 }}
+                {{ if $prev }}{{ $cnt = $prev.count }}{{ end }}
+                {{ $cities = merge $cities (dict $name (dict "count" (add $cnt 1) "type" "post")) }}
+            {{ end }}
+        {{ end }}
+    {{ end }}
+    {{ range .Site.Data.travel.places }}
+        {{ $prev := index $cities .name }}
+        {{ $cnt := 0 }}
+        {{ $typ := "manual" }}
+        {{ if $prev }}{{ $cnt = $prev.count }}{{ $typ = "post" }}{{ end }}
+        {{ $cities = merge $cities (dict .name (dict "count" $cnt "type" $typ)) }}
+    {{ end }}
+    {{ $list := slice }}
+    {{ range $k, $v := $cities }}
+        {{ $list = $list | append (dict "name" $k "count" $v.count "type" $v.type) }}
+    {{ end }}
+
+    <main class="moments-feed single-view" style="padding-top: 60px;">
+        <div class="travel-container">
+            <div class="travel-card">
+                <script id="travel-data" type="application/json">{{ $list | jsonify }}</script>
+                <div class="travel-map-wrap">
+                    <div id="travel-map"></div>
+                    <div class="travel-legend">
+                        <span class="travel-legend-item"><span class="travel-legend-dot" style="background:#00a8a8"></span>有动态 <b>{{ len (where $list "type" "post") }}</b></span>
+                        <span class="travel-legend-item"><span class="travel-legend-dot" style="background:#ff9d2e"></span>自标记 <b>{{ len (where $list "type" "manual") }}</b></span>
+                    </div>
+                </div>
+                <div class="travel-list">
+                    {{ range sort $list "count" "desc" }}
+                        <span class="travel-chip {{ if eq .type "manual" }}travel-chip-manual{{ end }}">{{ strings.TrimSuffix "市" .name }}{{ if gt .count 1 }}<em>{{ .count }}</em>{{ end }}</span>
+                    {{ end }}
+                </div>
+                <p class="travel-tip">发动态时填写 location 自动点亮；也可在 data/travel.yml 中手动添加城市。</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ "js/echarts.min.js" | relURL }}"></script>
+    <script>
+    (function () {
+        var el = document.getElementById('travel-map');
+        var dataEl = document.getElementById('travel-data');
+        if (!el || !dataEl || typeof echarts === 'undefined') return;
+        var visited = {};
+        try {
+            var parsed = JSON.parse(dataEl.textContent);
+            if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+            if (Array.isArray(parsed)) parsed.forEach(function (d) { visited[d.name] = d; });
+        } catch (e) {}
+        var COLOR_POST = '#00a8a8';
+        var COLOR_POST_HOVER = '#008c8c';
+        var COLOR_MANUAL = '#ff9d2e';
+        var COLOR_MANUAL_HOVER = '#f08500';
+        fetch('{{ "geo/china-cities.json" | relURL }}')
+            .then(function (r) { return r.json(); })
+            .then(function (geo) {
+                echarts.registerMap('chinaCities', geo);
+                var data = geo.features.map(function (f) {
+                    var name = f.properties.name;
+                    var info = visited[name];
+                    var isPost = !!(info && info.type === 'post');
+                    var isManual = !!(info && info.type === 'manual');
+                    return {
+                        name: name,
+                        value: info ? info.count : 0,
+                        itemStyle: (isPost || isManual) ? { areaColor: isPost ? COLOR_POST : COLOR_MANUAL } : undefined,
+                        emphasis: { itemStyle: { areaColor: isPost ? COLOR_POST_HOVER : (isManual ? COLOR_MANUAL_HOVER : '#e0e0de') } }
+                    };
+                });
+                var chart = echarts.init(el);
+                chart.setOption({
+                    tooltip: {
+                        backgroundColor: 'rgba(255,255,255,0.95)',
+                        borderColor: '#eee',
+                        textStyle: { color: '#333', fontSize: 13 },
+                        formatter: function (p) {
+                            var info = visited[p.name];
+                            if (!info) return p.name;
+                            if (info.type === 'post') return p.name + '（动态 ' + info.count + ' 条）';
+                            return p.name + '（手动标记）';
+                        }
+                    },
+                    series: [{
+                        type: 'map',
+                        map: 'chinaCities',
+                        roam: true,
+                        scaleLimit: { min: 0.6, max: 6 },
+                        zoom: 1.1,
+                        label: { show: false },
+                        itemStyle: {
+                            areaColor: '#f0f0ee',
+                            borderColor: '#ffffff',
+                            borderWidth: 0.6
+                        },
+                        emphasis: { label: { show: true, color: '#333', fontSize: 11 } },
+                        select: { disabled: true },
+                        data: data
+                    }]
+                });
+                window.addEventListener('resize', function () { chart.resize(); });
+            });
+    })();
+    </script>
+{{ end }}

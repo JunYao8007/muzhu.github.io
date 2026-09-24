@@ -93,15 +93,16 @@
                 {{/* 图片画廊（九宫格） */}}
                 {{/* 优先使用 Page Bundles 资源中的图片；广告贴中 logo 已作为头像，不再显示在大图 */}}
                 {{ $logoName := .Params.logo }}
+                {{/* 存 {src, res}：res 是资源对象，用于生成缩略图；无 res 的（外链/正文图）直接用原地址 */}}
                 {{ $images := slice }}
                 {{ range .Resources }}
                     {{ if or (eq .MediaType.SubType "jpeg") (eq .MediaType.SubType "png") (eq .MediaType.SubType "gif") (eq .MediaType.SubType "webp") }}
                         {{ if not (and $isAd $logoName (eq .Name $logoName)) }}
-                            {{ $images = $images | append .RelPermalink }}
+                            {{ $images = $images | append (dict "src" .RelPermalink "res" .) }}
                         {{ end }}
                     {{ end }}
                 {{ end }}
-                {{ $images = sort $images }}
+                {{ $images = sort $images "src" }}
                 
                 {{/* 如果没有 Page Bundles 图片，尝试从正文抓取 */}}
                 {{ if not $images }}
@@ -110,7 +111,13 @@
                     {{ if $imgTags }}
                         {{ range $imgTags }}
                             {{ $src := replaceRE "<img[^>]+src=\"([^\"]+)\"[^>]*>" "$1" . }}
-                            {{ $images = $images | append $src }}
+                            {{ $imgMap := dict "src" $src }}
+                            {{ if not (findRE "^(https?:)?//" $src) }}
+                                {{ with $currentPage.Resources.GetMatch $src }}
+                                    {{ $imgMap = dict "src" .RelPermalink "res" . }}
+                                {{ end }}
+                            {{ end }}
+                            {{ $images = $images | append $imgMap }}
                         {{ end }}
                         {{ $images = $images | uniq }}
                     {{ end }}
@@ -124,27 +131,41 @@
                         {{/* 只有一张图时的展示方式 */}}
                         <div class="gallery-single">
                             {{ range $images }}
-                                {{ $imgSrc := . }}
+                                {{ $imgSrc := .src }}
+                                {{ $thumbSrc := .src }}
                                 {{ if not (findRE "^(http|/)" $imgSrc) }}
                                     {{ with $currentPage.Resources.GetMatch $imgSrc }}
                                         {{ $imgSrc = .RelPermalink }}
+                                        {{ $thumbSrc = .RelPermalink }}
                                     {{ end }}
                                 {{ end }}
-                                <img src="{{ $imgSrc }}" alt="Image" decoding="async">
+                                {{ with .res }}
+                                    {{ if ne .MediaType.SubType "gif" }}
+                                        {{ $thumbSrc = (.Resize "1000x webp q80").RelPermalink }}
+                                    {{ end }}
+                                {{ end }}
+                                <img src="{{ $thumbSrc }}" data-original="{{ $imgSrc }}" alt="Image" decoding="async" loading="lazy">
                             {{ end }}
                         </div>
                     {{ else }}
                         {{/* 多张图时的九宫格布局 */}}
                         <div class="gallery-grid {{ if or (eq $len 2) (eq $len 4) }}cols-2{{ else }}cols-3{{ end }}">
                             {{ range $images }}
-                                {{ $imgSrc := . }}
+                                {{ $imgSrc := .src }}
+                                {{ $thumbSrc := .src }}
                                 {{ if not (findRE "^(http|/)" $imgSrc) }}
                                     {{ with $currentPage.Resources.GetMatch $imgSrc }}
                                         {{ $imgSrc = .RelPermalink }}
+                                        {{ $thumbSrc = .RelPermalink }}
+                                    {{ end }}
+                                {{ end }}
+                                {{ with .res }}
+                                    {{ if ne .MediaType.SubType "gif" }}
+                                        {{ $thumbSrc = (.Resize "800x webp q80").RelPermalink }}
                                     {{ end }}
                                 {{ end }}
                                 <div class="gallery-item">
-                                    <img src="{{ $imgSrc }}" alt="Image" decoding="async">
+                                    <img src="{{ $thumbSrc }}" data-original="{{ $imgSrc }}" alt="Image" decoding="async" loading="lazy">
                                 </div>
                             {{ end }}
                         </div>
@@ -165,7 +186,7 @@
                     <div class="footer-meta">
                         <span class="moment-time">{{ .Date.Format "2006年1月2日" }}</span>
                         {{ if and .Site.Params.showLocation .Params.location }}
-                        <span class="moment-location">{{ .Params.location }}</span>
+                        <a class="moment-location" href='{{ "travel.html" | relURL }}' title="旅行足迹">{{ .Params.location }}</a>
                         {{ end }}
                         {{ if and .Site.Params.showTags .Params.tags }}
                         <span class="moment-tags">
