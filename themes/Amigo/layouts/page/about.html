@@ -11,6 +11,16 @@
                         <p class="about-bio">{{ .Site.Params.description }}</p>
                     </div>
                 </div>
+                {{ with .Params.stats }}
+                <div class="about-stats">
+                    {{ range . }}
+                    <div class="about-stat-item">
+                        <div class="about-stat-num">{{ .num }}</div>
+                        <div class="about-stat-label">{{ .label }}</div>
+                    </div>
+                    {{ end }}
+                </div>
+                {{ end }}
                 <div class="article-text moment-text about-text">
                     {{ .Content | safeHTML }}
                 </div>

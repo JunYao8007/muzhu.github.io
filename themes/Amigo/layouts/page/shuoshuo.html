@@ -27,6 +27,13 @@
 
     <main class="moments-feed single-view" style="padding-top: 60px;">
         <div class="shuoshuo-container">
+            {{/* 页面说明：解释这个页面是干嘛的（系统消息样式） */}}
+            {{ with .Params.intro }}
+            <div class="shuoshuo-intro">
+                <i class="ri-information-line"></i>
+                <span>{{ . }}</span>
+            </div>
+            {{ end }}
             <div class="shuoshuo-chat" data-shuoshuo-total="{{ len $lines }}" data-shuoshuo-page-size="10">
                 {{ $avatar := .Site.Params.avatar | default ( "images/avatar.jpg" | relURL ) }}
                 {{ $username := .Site.Params.username | default .Site.Title }}

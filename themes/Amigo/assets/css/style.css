@@ -230,8 +230,9 @@ blockquote {
     height: 230px;
     background-size: cover;
     background-position: center;
-    background-color: var(--text-main); /* 图片没加载出来的兜底色 */
     margin-bottom: 12px;
+    /* 无封面图时：中国色 · 景泰蓝 #2775b6 渐变 */
+    background-image: linear-gradient(160deg, #3f8bce 0%, #2775b6 50%, #1a5488 100%);
 }
 
 .moments-header-video {
@@ -1802,6 +1803,14 @@ body:has(.view-image) .single-header {
     }
 }
 
+/* 手机端：顶部大图与电脑端保持相同宽高比（230 / 内容最大宽度） */
+@media (max-width: 768px) {
+    .moments-header {
+        height: auto;
+        aspect-ratio: 600 / 230;
+    }
+}
+
 /* 首页列表评论项样式 */
 .feed-comments .atk-list {
     margin: 0 !important;
@@ -3196,6 +3205,24 @@ body {
     gap: 18px;
     padding: 10px 4px 18px;
 }
+/* 数据面板（项目数 / 造价 / 经验） */
+.about-stats {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    padding: 18px 0 6px;
+    margin-bottom: 8px;
+}
+.about-stat-num {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+.about-stat-label {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
 .about-avatar {
     width: 64px;
     height: 64px;
@@ -3230,6 +3257,27 @@ body {
 /* ===== 说说页面（微信聊天气泡） ===== */
 .shuoshuo-container {
     padding: 0 10px;
+}
+/* 页面说明（系统消息样式，居中灰色胶囊） */
+.shuoshuo-intro {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 0 auto 4px;
+    width: fit-content;
+    max-width: 92%;
+    background: rgba(0, 0, 0, 0.06);
+    color: var(--text-muted, #999);
+    font-size: 12px;
+    line-height: 1.6;
+    padding: 4px 12px;
+    border-radius: 6px;
+    text-align: left;
+}
+.shuoshuo-intro i {
+    font-size: 14px;
+    flex-shrink: 0;
 }
 .shuoshuo-chat {
     background: transparent;

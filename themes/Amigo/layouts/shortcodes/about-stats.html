@@ -1,0 +1,10 @@
+{{ with .Page.Params.stats }}
+<div class="about-stats">
+    {{ range . }}
+    <div class="about-stat-item">
+        <div class="about-stat-num">{{ .num }}</div>
+        <div class="about-stat-label">{{ .label }}</div>
+    </div>
+    {{ end }}
+</div>
+{{ end }}

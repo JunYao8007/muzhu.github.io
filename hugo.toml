@@ -64,8 +64,7 @@ theme = 'Amigo'
   enableDanmaku = true
 
   # 首页顶部封面：可以是图片或视频
-  headerMedia = "/images/header.jpg"
-  # headerMedia = ""
+  headerMedia = "/images/header.webp"
   
   # 2. Giscus 评论（官方文档：https://giscus.app/）
   # 如果上面填了 Artalk，会优先用 Artalk。两个都空着就不显示评论。

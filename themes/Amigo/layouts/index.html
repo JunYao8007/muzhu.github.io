@@ -1,13 +1,13 @@
 {{ define "main" }}
     {{/* 顶部页眉 / 封面图区域：支持图片和视频 */}}
-    {{- $media := .Site.Params.headerMedia | default .Site.Params.cover -}}
+    {{- $media := .Site.Params.headerMedia -}}
     {{- $isVideo := false -}}
     {{- if $media -}}
         {{- if or (strings.HasSuffix (lower $media) ".mp4") (strings.HasSuffix (lower $media) ".webm") (strings.HasSuffix (lower $media) ".ogg") -}}
             {{- $isVideo = true -}}
         {{- end -}}
     {{- end -}}
-    <header class="moments-header" {{ if not $isVideo }}style="background-image: url('{{ $media | default ( "images/cover.jpg" | relURL ) }}');"{{ end }}>
+    <header class="moments-header" {{ if and $media (not $isVideo) }}style="background-image: url('{{ $media }}');"{{ end }}>
         {{ if and $media $isVideo }}
         <video class="moments-header-video" src="{{ $media }}" autoplay muted loop playsinline preload="auto"></video>
         {{ end }}

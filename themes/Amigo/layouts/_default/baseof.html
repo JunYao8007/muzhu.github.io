@@ -67,7 +67,7 @@
             twikooLang: "{{ .Site.Params.twikooLang | default "zh-CN" }}",
             enableDanmaku: {{ if eq .Site.Params.enableDanmaku false }}false{{ else }}true{{ end }},
             headerMediaList: {{ with .Site.Params.headerMediaList }}{{ . | jsonify }}{{ else }}[]{{ end }},
-            headerMedia: "{{ .Site.Params.headerMedia | default .Site.Params.cover }}"
+            headerMedia: "{{ .Site.Params.headerMedia }}"
         };
     </script>
 

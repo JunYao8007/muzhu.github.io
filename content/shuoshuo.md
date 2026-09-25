@@ -4,6 +4,7 @@ type: page
 layout: shuoshuo
 url: /shuoshuo.html
 comments: false
+intro: "这里是「说说」页面，记录我日常的悄悄话和一闪而过的小想法，就像微信聊天记录一样，只不过这里是公开的"
 ---
 
 2026-09-25 | 语音:/audio/司徒骏文,林嘉 - 情色.mp3
