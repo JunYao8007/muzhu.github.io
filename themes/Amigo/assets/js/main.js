@@ -15,6 +15,8 @@ document.addEventListener("DOMContentLoaded", function() {
     initVoiceMessages();
     initInfiniteFeed();
     initProfileCard();
+    initShuoshuoFeed();
+    if (typeof window.initTravelMap === 'function') window.initTravelMap();
 });
 
 // 页面跳转前，先把 Artalk 评论实例给销毁掉，省得占内存
@@ -46,6 +48,7 @@ document.addEventListener("pjax:complete", function() {
     initVoiceMessages();
     initInfiniteFeed();
     initProfileCard();
+    initShuoshuoFeed();
 });
 
 /* ========== 双击头像弹出个人资料卡片（含卡片内搜索） ========== */
@@ -75,7 +78,7 @@ function initProfileCard() {
     avatar.addEventListener('click', function(e) {
         e.preventDefault();
         var now = Date.now();
-        if (now - lastTap < 350) {
+        if (now - lastTap < 500) {
             open();
             lastTap = 0;
         } else {
@@ -249,13 +252,12 @@ function initProfileCard() {
         if (e.key === 'Enter') e.preventDefault();
     });
 
-    // 点击首页动态里的标签/地点 → 打开卡片搜索
+    // 点击首页动态里的标签 → 打开卡片搜索（地点是链接，跳转旅行地图）
     var feed = document.querySelector('.moments-feed');
     if (feed) {
         feed.addEventListener('click', function(e) {
             var isTag = e.target.classList.contains('moment-tag');
-            var isLoc = e.target.classList.contains('moment-location');
-            if (!isTag && !isLoc) return;
+            if (!isTag) return;
             e.preventDefault();
             e.stopPropagation();
             var word = e.target.textContent.replace('#', '').trim();
@@ -1646,4 +1648,40 @@ function initVoiceMessages() {
             }
         });
     });
+}
+
+/* ========== 说说页无限滚动 ========== */
+function initShuoshuoFeed() {
+    var chat = document.querySelector('.shuoshuo-chat');
+    if (!chat || chat.dataset.shuoshuoInit) return;
+    chat.dataset.shuoshuoInit = '1';
+
+    var total = parseInt(chat.dataset.shuoshuoTotal, 10) || 0;
+    var pageSize = parseInt(chat.dataset.shuoshuoPageSize, 10) || 10;
+    var msgs = Array.prototype.slice.call(chat.querySelectorAll('.shuoshuo-msg'));
+    var shown = Math.min(pageSize, msgs.length);
+    var sentinel = chat.querySelector('.shuoshuo-sentinel');
+
+    if (msgs.length <= pageSize || !sentinel) return;
+
+    function reveal() {
+        var next = Math.min(shown + pageSize, msgs.length);
+        for (var i = shown; i < next; i++) msgs[i].classList.remove('shuoshuo-hidden');
+        shown = next;
+        if (shown >= msgs.length) {
+            var end = document.createElement('div');
+            end.className = 'shuoshuo-end';
+            end.textContent = '— 到底啦 —';
+            chat.replaceChild(end, sentinel);
+        }
+    }
+
+    var timer = null;
+    var observer = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) {
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(reveal, 250);
+        }
+    }, { rootMargin: '200px' });
+    observer.observe(sentinel);
 }

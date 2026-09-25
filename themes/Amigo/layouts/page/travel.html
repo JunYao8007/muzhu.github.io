@@ -44,75 +44,99 @@
                         <span class="travel-chip {{ if eq .type "manual" }}travel-chip-manual{{ end }}">{{ strings.TrimSuffix "市" .name }}{{ if gt .count 1 }}<em>{{ .count }}</em>{{ end }}</span>
                     {{ end }}
                 </div>
-                <p class="travel-tip">发动态时填写 location 自动点亮；也可在 data/travel.yml 中手动添加城市。</p>
             </div>
         </div>
     </main>
 
-    <script src="{{ "js/echarts.min.js" | relURL }}"></script>
     <script>
     (function () {
-        var el = document.getElementById('travel-map');
-        var dataEl = document.getElementById('travel-data');
-        if (!el || !dataEl || typeof echarts === 'undefined') return;
-        var visited = {};
-        try {
-            var parsed = JSON.parse(dataEl.textContent);
-            if (typeof parsed === 'string') parsed = JSON.parse(parsed);
-            if (Array.isArray(parsed)) parsed.forEach(function (d) { visited[d.name] = d; });
-        } catch (e) {}
-        var COLOR_POST = '#00a8a8';
-        var COLOR_POST_HOVER = '#008c8c';
-        var COLOR_MANUAL = '#ff9d2e';
-        var COLOR_MANUAL_HOVER = '#f08500';
-        fetch('{{ "geo/china-cities.json" | relURL }}')
-            .then(function (r) { return r.json(); })
-            .then(function (geo) {
-                echarts.registerMap('chinaCities', geo);
-                var data = geo.features.map(function (f) {
-                    var name = f.properties.name;
-                    var info = visited[name];
-                    var isPost = !!(info && info.type === 'post');
-                    var isManual = !!(info && info.type === 'manual');
-                    return {
-                        name: name,
-                        value: info ? info.count : 0,
-                        itemStyle: (isPost || isManual) ? { areaColor: isPost ? COLOR_POST : COLOR_MANUAL } : undefined,
-                        emphasis: { itemStyle: { areaColor: isPost ? COLOR_POST_HOVER : (isManual ? COLOR_MANUAL_HOVER : '#e0e0de') } }
-                    };
-                });
-                var chart = echarts.init(el);
-                chart.setOption({
-                    tooltip: {
-                        backgroundColor: 'rgba(255,255,255,0.95)',
-                        borderColor: '#eee',
-                        textStyle: { color: '#333', fontSize: 13 },
-                        formatter: function (p) {
-                            var info = visited[p.name];
-                            if (!info) return p.name;
-                            if (info.type === 'post') return p.name + '（动态 ' + info.count + ' 条）';
-                            return p.name + '（手动标记）';
-                        }
-                    },
-                    series: [{
-                        type: 'map',
-                        map: 'chinaCities',
-                        roam: true,
-                        scaleLimit: { min: 0.6, max: 6 },
-                        zoom: 1.1,
-                        label: { show: false },
-                        itemStyle: {
-                            areaColor: '#f0f0ee',
-                            borderColor: '#ffffff',
-                            borderWidth: 0.6
-                        },
-                        emphasis: { label: { show: true, color: '#333', fontSize: 11 } },
-                        select: { disabled: true },
-                        data: data
-                    }]
-                });
-                window.addEventListener('resize', function () { chart.resize(); });
-            });
+        // PJAX 跳转只替换 .main-wrapper，页面级 <script> 不会重新执行，
+        // 因此把初始化挂到 window 上，由页面直载/PJAX 完成回调共同触发。
+        window.initTravelMap = function () {
+            var el = document.getElementById('travel-map');
+            var dataEl = document.getElementById('travel-data');
+            if (!el || !dataEl || el.dataset.mapInit) return;
+            el.dataset.mapInit = '1';
+            if (el._chart) { el._chart.dispose(); el._chart = null; }
+
+            var visited = {};
+            try {
+                var parsed = JSON.parse(dataEl.textContent);
+                if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+                if (Array.isArray(parsed)) parsed.forEach(function (d) { visited[d.name] = d; });
+            } catch (e) {}
+            var COLOR_POST = '#00a8a8';
+            var COLOR_POST_HOVER = '#008c8c';
+            var COLOR_MANUAL = '#ff9d2e';
+            var COLOR_MANUAL_HOVER = '#f08500';
+
+            function render() {
+                fetch('{{ "geo/china-cities.json" | relURL }}')
+                    .then(function (r) { return r.json(); })
+                    .then(function (geo) {
+                        echarts.registerMap('chinaCities', geo);
+                        var data = geo.features.map(function (f) {
+                            var name = f.properties.name;
+                            var info = visited[name];
+                            var isPost = !!(info && info.type === 'post');
+                            var isManual = !!(info && info.type === 'manual');
+                            return {
+                                name: name,
+                                value: info ? info.count : 0,
+                                itemStyle: (isPost || isManual) ? { areaColor: isPost ? COLOR_POST : COLOR_MANUAL } : undefined,
+                                emphasis: { itemStyle: { areaColor: isPost ? COLOR_POST_HOVER : (isManual ? COLOR_MANUAL_HOVER : '#e0e0de') } }
+                            };
+                        });
+                        var chart = echarts.init(el);
+                        el._chart = chart;
+                        chart.setOption({
+                            tooltip: {
+                                backgroundColor: 'rgba(255,255,255,0.95)',
+                                borderColor: '#eee',
+                                textStyle: { color: '#333', fontSize: 13 },
+                                formatter: function (p) {
+                                    var info = visited[p.name];
+                                    if (!info) return p.name;
+                                    if (info.type === 'post') return p.name + '（动态 ' + info.count + ' 条）';
+                                    return p.name + '（手动标记）';
+                                }
+                            },
+                            series: [{
+                                type: 'map',
+                                map: 'chinaCities',
+                                roam: true,
+                                scaleLimit: { min: 0.6, max: 6 },
+                                zoom: 1.1,
+                                label: { show: false },
+                                itemStyle: {
+                                    areaColor: '#f0f0ee',
+                                    borderColor: '#ffffff',
+                                    borderWidth: 0.6
+                                },
+                                emphasis: { label: { show: true, color: '#333', fontSize: 11 } },
+                                select: { disabled: true },
+                                data: data
+                            }]
+                        });
+                        window.addEventListener('resize', function () { chart.resize(); });
+                    });
+            }
+
+            if (typeof echarts === 'undefined') {
+                var s = document.createElement('script');
+                s.src = '{{ "js/echarts.min.js" | relURL }}';
+                s.onload = render;
+                document.head.appendChild(s);
+            } else {
+                render();
+            }
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', window.initTravelMap);
+        } else {
+            window.initTravelMap();
+        }
     })();
     </script>
 {{ end }}

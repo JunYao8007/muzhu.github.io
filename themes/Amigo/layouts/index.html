@@ -17,7 +17,7 @@
             </div>
             <div class="header-info">
                 <h1 class="header-name">
-                    <a href="{{ "posts" | relURL }}">{{ .Site.Params.username | default .Site.Title }}</a>
+                    <a href="{{ "about.html" | relURL }}">{{ .Site.Params.username | default .Site.Title }}</a>
                 </h1>
             </div>
         </div>
@@ -33,6 +33,16 @@
 
     {{/* 动态列表（信息流，JS 无限滚动分批加载） */}}
     <main class="moments-feed feed-infinite" data-feed-page-size="{{ .Site.Params.feedPageSize | default 10 }}">
+        {{ with .Site.GetPage "/shuoshuo" }}
+        {{ $shuoshuoCount := 0 }}
+        {{ range split .RawContent "\n" }}
+            {{ if trim . " \t\r" }}{{ $shuoshuoCount = add $shuoshuoCount 1 }}{{ end }}
+        {{ end }}
+        <a class="shuoshuo-entry" href="{{ "shuoshuo.html" | relURL }}">
+            <img class="shuoshuo-entry-avatar" src="{{ .Site.Params.avatar | default ( "images/avatar.jpg" | relURL ) }}" alt="说说">
+            <span>{{ $shuoshuoCount }} 条新消息</span>
+        </a>
+        {{ end }}
         {{ $pages := where .Site.RegularPages "Section" "posts" }}
         {{ $items := slice }}
         {{ range $pages }}

@@ -1,0 +1,20 @@
+{{ define "main" }}
+    {{ partial "header-page.html" . }}
+
+    <main class="moments-feed single-view" style="padding-top: 60px;">
+        <article class="single-article">
+            <div class="article-body">
+                <div class="about-header">
+                    <img class="about-avatar" src="{{ .Site.Params.avatar | default ( "images/avatar.jpg" | relURL ) }}" alt="{{ .Site.Params.username }}">
+                    <div class="about-info">
+                        <h2 class="about-name">{{ .Site.Params.username | default .Site.Title }}</h2>
+                        <p class="about-bio">{{ .Site.Params.description }}</p>
+                    </div>
+                </div>
+                <div class="article-text moment-text about-text">
+                    {{ .Content | safeHTML }}
+                </div>
+            </div>
+        </article>
+    </main>
+{{ end }}

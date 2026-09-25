@@ -38,7 +38,7 @@ theme = 'Amigo'
   description = "造价工程师 现居山东青岛"
   
   # 首页最上面那张大图
-  cover = "/images/header.png"
+  cover = "/images/header.jpg"
   
   # ---------------------------------------------------------------------------------------
   # 网站全局设置
@@ -64,7 +64,7 @@ theme = 'Amigo'
   enableDanmaku = true
 
   # 首页顶部封面：可以是图片或视频
-  headerMedia = "/images/header.png"
+  headerMedia = "/images/header.jpg"
   # headerMedia = ""
   
   # 2. Giscus 评论（官方文档：https://giscus.app/）

@@ -1,0 +1,57 @@
+{{ define "main" }}
+    {{ partial "header-page.html" . }}
+
+    {{/* 说说列表：一行一条，格式 "时间 | 内容"（时间可省略）；
+         内容为 "语音:URL" 时渲染语音气泡 */}}
+    {{ $lines := slice }}
+    {{ range split .RawContent "\n" }}
+        {{ $line := trim . " \t\r" }}
+        {{ if $line }}
+            {{ $time := "" }}
+            {{ $text := $line }}
+            {{ $voice := "" }}
+            {{ if findRE "^[0-9]{4}-[0-9]{2}-[0-9]{2}" $line }}
+                {{ $parts := split $line "|" }}
+                {{ if gt (len $parts) 1 }}
+                    {{ $time = trim (index $parts 0) " " }}
+                    {{ $text = trim (delimit (after 1 $parts) "|") " " }}
+                {{ end }}
+            {{ end }}
+            {{ if findRE "^语音:" $text }}
+                {{ $voice = trim (replace $text "语音:" "") " " }}
+                {{ $text = "" }}
+            {{ end }}
+            {{ $lines = $lines | append (dict "time" $time "text" $text "voice" $voice) }}
+        {{ end }}
+    {{ end }}
+
+    <main class="moments-feed single-view" style="padding-top: 60px;">
+        <div class="shuoshuo-container">
+            <div class="shuoshuo-chat" data-shuoshuo-total="{{ len $lines }}" data-shuoshuo-page-size="10">
+                {{ $avatar := .Site.Params.avatar | default ( "images/avatar.jpg" | relURL ) }}
+                {{ $username := .Site.Params.username | default .Site.Title }}
+                {{ range $i, $item := $lines }}
+                <div class="shuoshuo-msg{{ if ge $i 10 }} shuoshuo-hidden{{ end }}">
+                    <img class="shuoshuo-avatar" src="{{ $avatar }}" alt="{{ $username }}">
+                    <div class="shuoshuo-bubble-wrap">
+                        {{ if $item.voice }}
+                        <div class="amigo-voice-bubble" data-src="{{ $item.voice }}">
+                            <div class="amigo-voice-icon">
+                                <span></span><span></span><span></span>
+                            </div>
+                            <span class="amigo-voice-duration">…</span>
+                        </div>
+                        {{ else }}
+                        <div class="shuoshuo-bubble">{{ $item.text }}</div>
+                        {{ end }}
+                        {{ with $item.time }}<div class="shuoshuo-time">{{ . }}</div>{{ end }}
+                    </div>
+                </div>
+                {{ end }}
+                {{ if gt (len $lines) 10 }}
+                <div class="shuoshuo-sentinel"></div>
+                {{ end }}
+            </div>
+        </div>
+    </main>
+{{ end }}
