@@ -33,16 +33,11 @@
             <div class="travel-card">
                 <script id="travel-data" type="application/json">{{ $list | jsonify }}</script>
                 <div class="travel-map-wrap">
-                    <div id="travel-map"></div>
+                    <div id="travel-map"><div class="travel-loading">地图加载中…</div></div>
                     <div class="travel-legend">
                         <span class="travel-legend-item"><span class="travel-legend-dot" style="background:#00a8a8"></span>有动态 <b>{{ len (where $list "type" "post") }}</b></span>
                         <span class="travel-legend-item"><span class="travel-legend-dot" style="background:#ff9d2e"></span>自标记 <b>{{ len (where $list "type" "manual") }}</b></span>
                     </div>
-                </div>
-                <div class="travel-list">
-                    {{ range sort $list "count" "desc" }}
-                        <span class="travel-chip {{ if eq .type "manual" }}travel-chip-manual{{ end }}">{{ strings.TrimSuffix "市" .name }}{{ if gt .count 1 }}<em>{{ .count }}</em>{{ end }}</span>
-                    {{ end }}
                 </div>
             </div>
         </div>
@@ -70,11 +65,15 @@
             var COLOR_MANUAL = '#ff9d2e';
             var COLOR_MANUAL_HOVER = '#f08500';
 
+            // 立即开始拉取 GeoJSON（与 ECharts 加载并行，不互相等待）
+            var geoReady = fetch('{{ "geo/china-cities.json" | relURL }}')
+                .then(function (r) { return r.json(); });
+
             function render() {
-                fetch('{{ "geo/china-cities.json" | relURL }}')
-                    .then(function (r) { return r.json(); })
-                    .then(function (geo) {
+                geoReady.then(function (geo) {
                         echarts.registerMap('chinaCities', geo);
+                        var loading = el.querySelector('.travel-loading');
+                        if (loading) loading.remove();
                         var data = geo.features.map(function (f) {
                             var name = f.properties.name;
                             var info = visited[name];

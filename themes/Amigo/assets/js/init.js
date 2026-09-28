@@ -68,18 +68,47 @@ function initHelpers() {
 }
 
 // 整个页面加载完后的初始化逻辑
-document.addEventListener("DOMContentLoaded", function() {
-    initHelpers();
+    document.addEventListener("DOMContentLoaded", function() {
+        initHelpers();
 
-    // 配置 PJAX，实现无刷新跳转
-    if (typeof Pjax !== 'undefined') {
-        window.pjax = new Pjax({
-            elements: "a", 
-            selectors: ["head title", ".main-wrapper"],
-            cacheBust: false,
-            analytics: false
-        });
-    }
+        // 内部链接预加载：触摸/悬停时就开始拉取页面，跳转时几乎无延迟
+        (function () {
+            function isInternal(href) {
+                try {
+                    var u = new URL(href, location.href);
+                    return u.origin === location.origin && u.pathname !== location.pathname;
+                } catch (e) { return false; }
+            }
+            function prefetch(href) {
+                if (!href || prefetch._done.has(href)) return;
+                prefetch._done.add(href);
+                var l = document.createElement('link');
+                l.rel = 'prefetch';
+                l.href = href;
+                document.head.appendChild(l);
+            }
+            prefetch._done = new Set();
+
+            document.addEventListener('touchstart', function (e) {
+                var a = e.target.closest && e.target.closest('a[href]');
+                if (a && isInternal(a.href)) prefetch(a.href);
+            }, { passive: true });
+
+            document.addEventListener('mouseover', function (e) {
+                var a = e.target.closest && e.target.closest('a[href]');
+                if (a && isInternal(a.href)) prefetch(a.href);
+            });
+        })();
+
+        // 配置 PJAX，实现无刷新跳转
+        if (typeof Pjax !== 'undefined') {
+            window.pjax = new Pjax({
+                elements: "a", 
+                selectors: ["head title", ".main-wrapper"],
+                cacheBust: false,
+                analytics: false
+            });
+        }
 
     // PJAX 发起请求时跑的逻辑
     document.addEventListener("pjax:send", function() {

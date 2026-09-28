@@ -1,5 +1,5 @@
 ---
-title: 旅行足迹
+title: 地图
 type: page
 layout: travel
 url: /travel.html

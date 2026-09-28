@@ -217,6 +217,7 @@
                         {{ end }}
 
                         <div class="action-wrapper">
+                            {{ if not .Params.hideMore }}
                             {{ if and (eq .Site.Params.commentMode "artalk") .Site.Params.artalkServer $feedShowComments }}
                             <button class="action-toggle" aria-label="Toggle Actions">
                                 <i class="ri-more-fill"></i>
@@ -238,6 +239,7 @@
                             <a href="{{ .RelPermalink }}" class="action-link-more" title="查看详情">
                                 <i class="ri-more-fill"></i>
                             </a>
+                            {{ end }}
                             {{ end }}
                         </div>
                     </div>

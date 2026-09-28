@@ -59,8 +59,7 @@ function initProfileCard() {
     if (!avatar || !overlay || !card || avatar.dataset.profileInit) return;
     avatar.dataset.profileInit = '1';
 
-    var lastTap = 0;
-    var searchIndex = null;   // 搜索索引，首次搜索时构建
+    var searchIndex = null;
     var searchTimer = null;
 
     /* ---------- 弹窗开关 ---------- */
@@ -71,20 +70,43 @@ function initProfileCard() {
     function close() {
         overlay.classList.remove('active');
         document.body.style.overflow = '';
-        // 关闭时顺便退出搜索视图
         setTimeout(exitSearch, 300);
     }
 
-    avatar.addEventListener('click', function(e) {
-        e.preventDefault();
+    /* ---------- 双击检测 ----------
+       桌面用原生 dblclick；移动端用两次 touchstart（间隔 ≤400ms，
+       移动距离 ≤20px）模拟，避免单 click 双击检测被浏览器的 300ms
+       点击延迟吞掉。*/
+    var TAP_MAX = 400;   // 两次触摸最大间隔（毫秒）
+    var TAP_MOVE = 20;   // 触摸期间允许的最大移动（像素）
+    var lastTap = 0;
+    var touchStartX = 0;
+    var touchStartY = 0;
+
+    avatar.addEventListener('dblclick', open);
+
+    avatar.addEventListener('touchstart', function (e) {
+        var t = e.changedTouches[0];
+        touchStartX = t.clientX;
+        touchStartY = t.clientY;
         var now = Date.now();
-        if (now - lastTap < 500) {
+        if (now - lastTap < TAP_MAX) {
+            e.preventDefault();   // 阻止浏览器双击放大
             open();
             lastTap = 0;
         } else {
             lastTap = now;
         }
-    });
+    }, { passive: false });
+
+    // 移动距离过大则取消双击判定
+    avatar.addEventListener('touchmove', function (e) {
+        var t = e.changedTouches[0];
+        if (Math.abs(t.clientX - touchStartX) > TAP_MOVE ||
+            Math.abs(t.clientY - touchStartY) > TAP_MOVE) {
+            lastTap = 0;
+        }
+    }, { passive: true });
 
     var closeBtn = document.getElementById('profile-close');
     if (closeBtn) closeBtn.addEventListener('click', close);
@@ -146,6 +168,7 @@ function initProfileCard() {
         searchView.style.height = Math.min(cardH, maxH) + 'px';
         card.classList.add('is-searching');
         searchInput.value = prefill || '';
+        setTab('all');
         runSearch();
         setTimeout(function() { searchInput.focus(); }, 120);
     }
@@ -183,21 +206,24 @@ function initProfileCard() {
         var query = searchInput.value.trim().toLowerCase();
         searchClear.style.display = query ? 'flex' : 'none';
         if (!query) {
-            searchResults.innerHTML = '<div class="profile-search-tip"><i class="ri-search-eye-line"></i>输入关键词，搜索动态内容、标签或地点</div>';
+            renderDiscover();
             return;
         }
         var hits = [];
         searchIndex.forEach(function(item) {
-            if (item.text.toLowerCase().indexOf(query) !== -1 ||
-                item.author.toLowerCase().indexOf(query) !== -1 ||
-                item.location.toLowerCase().indexOf(query) !== -1 ||
-                item.tags.toLowerCase().indexOf(query) !== -1 ||
-                item.time.toLowerCase().indexOf(query) !== -1) {
-                hits.push(item);
-            }
+            var inText = item.text.toLowerCase().indexOf(query) !== -1 || item.author.toLowerCase().indexOf(query) !== -1;
+            var inTags = item.tags.toLowerCase().indexOf(query) !== -1;
+            var inLoc = item.location.toLowerCase().indexOf(query) !== -1;
+            var inMeta = item.time.toLowerCase().indexOf(query) !== -1;
+            // 按分类 tab 过滤：全部命中任意字段即可，其余只认对应字段
+            var ok = currentTab === 'all' ? (inText || inTags || inLoc || inMeta)
+                : currentTab === 'text' ? inText
+                : currentTab === 'tags' ? inTags
+                : inLoc;
+            if (ok) hits.push(item);
         });
         if (!hits.length) {
-            searchResults.innerHTML = '<div class="profile-search-tip"><i class="ri-emotion-sad-line"></i>未找到相关动态</div>';
+            searchResults.innerHTML = '<div class="profile-search-tip"><i class="ri-emotion-sad-line"></i>未找到相关内容</div>';
             return;
         }
         var html = '<div class="profile-search-count">找到 ' + hits.length + ' 条动态</div>';
@@ -211,9 +237,51 @@ function initProfileCard() {
         searchResults.innerHTML = html;
     }
 
+    /* ---------- 搜索发现：随机动态标题 ---------- */
+    function renderDiscover() {
+        if (!searchIndex || !searchIndex.length) {
+            searchResults.innerHTML = '';
+            return;
+        }
+        // 洗牌取 8 条
+        var pool = searchIndex.slice();
+        for (var i = pool.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+        }
+        var picks = pool.slice(0, 4);
+        var html = '<div class="ss-discover-title"><span>搜索发现</span></div><div class="ss-discover-list">';
+        picks.forEach(function(item) {
+            var title = item.text.replace(/\s+/g, ' ').trim();
+            if (!title) title = item.time || '（无文字动态）';
+            html += '<button class="ss-discover-item" type="button" data-target="' + item.el.id + '"><span class="ss-discover-text">' + escapeHtml(title) + '</span></button>';
+        });
+        html += '</div>';
+        searchResults.innerHTML = html;
+    }
+
+    /* ---------- 搜一搜分类 tab ---------- */
+    var currentTab = 'all';
+    var tabsEl = document.getElementById('ss-tabs');
+    function setTab(tab) {
+        currentTab = tab;
+        if (!tabsEl) return;
+        Array.prototype.forEach.call(tabsEl.querySelectorAll('.ss-tab'), function(t) {
+            t.classList.toggle('active', t.getAttribute('data-tab') === tab);
+        });
+    }
+    if (tabsEl) {
+        tabsEl.addEventListener('click', function(e) {
+            var t = e.target.closest ? e.target.closest('.ss-tab') : null;
+            if (!t) return;
+            setTab(t.getAttribute('data-tab'));
+            runSearch();
+        });
+    }
+
     // 点击结果：关卡片 → 展开到目标动态 → 平滑滚动 + 闪烁高亮
     searchResults.addEventListener('click', function(e) {
-        var item = e.target.closest ? e.target.closest('.profile-search-item') : null;
+        var item = e.target.closest ? e.target.closest('.profile-search-item, .ss-discover-item') : null;
         if (!item) return;
         var targetId = item.getAttribute('data-target');
         var target = document.getElementById(targetId);
@@ -239,6 +307,11 @@ function initProfileCard() {
 
     searchBtn.addEventListener('click', function() { enterSearch(''); });
     searchBack.addEventListener('click', exitSearch);
+    var searchGo = document.getElementById('profile-search-go');
+    if (searchGo) searchGo.addEventListener('click', function() {
+        runSearch();
+        searchInput.blur();
+    });
     if (searchClear) searchClear.addEventListener('click', function() {
         searchInput.value = '';
         runSearch();
@@ -1497,8 +1570,8 @@ function initMoments() {
             toggleBtn.style.display = 'none';
             toggleBtn.innerText = '全文';
 
-            // 如果有语音消息，不需要折叠
-            const hasSpecialContent = voiceMsgs.length > 0;
+            // 如果有语音消息或音乐卡片，不需要折叠
+            const hasSpecialContent = voiceMsgs.length > 0 || textDiv.querySelectorAll('.ncm-card').length > 0;
 
             // Check overflow after a small delay to ensure rendering
             setTimeout(() => {

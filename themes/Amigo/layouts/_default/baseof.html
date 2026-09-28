@@ -153,19 +153,32 @@
             </div>
             <div class="profile-card-footer">© {{ now.Year }} · {{ .Site.Params.username | default .Site.Title }} · Powered by Hugo</div>
 
-            <!-- 搜索视图（点"搜索动态"后卡片切换到此视图） -->
+            <!-- 搜索视图（微信搜一搜风格） -->
             <div class="profile-search-view" id="profile-search-view">
-                <div class="profile-search-bar">
+                <div class="ss-header">
                     <button class="profile-search-back" id="profile-search-back" aria-label="返回">
                         <i class="ri-arrow-left-line"></i>
                     </button>
-                    <div class="profile-search-input-wrap">
-                        <i class="ri-search-line"></i>
-                        <input type="text" id="profile-search-input" placeholder="" autocomplete="off">
+                    <svg class="ss-logo" viewBox="0 0 24 24" fill="none" stroke="#f04142" stroke-width="4" stroke-linecap="round" aria-hidden="true">
+                        <path d="M12 7.5V3.2"/><path d="M15.9 9.75L20.2 7.25"/><path d="M15.9 14.25L20.2 16.75"/>
+                        <path d="M12 16.5v4.3"/><path d="M8.1 14.25L3.8 16.75"/><path d="M8.1 9.75L3.8 7.25"/>
+                    </svg>
+                    <span class="ss-title">搜一搜</span>
+                </div>
+                <div class="ss-bar">
+                    <div class="ss-input-wrap">
+                        <input type="text" id="profile-search-input" placeholder="搜索" autocomplete="off">
                         <button id="profile-search-clear" aria-label="清除" style="display: none;">
                             <i class="ri-close-circle-fill"></i>
                         </button>
                     </div>
+                    <button class="ss-go" id="profile-search-go" type="button">搜索</button>
+                </div>
+                <div class="ss-tabs" id="ss-tabs">
+                    <span class="ss-tab active" data-tab="all">全部</span>
+                    <span class="ss-tab" data-tab="text">动态</span>
+                    <span class="ss-tab" data-tab="tags">标签</span>
+                    <span class="ss-tab" data-tab="loc">地点</span>
                 </div>
                 <div class="profile-search-results" id="profile-search-results"></div>
             </div>

@@ -1,8 +1,14 @@
-[build]
-  command = "hugo --gc --minify"
-  publish = "public"
+[[headers]]
+  for = "/geo/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
 
-[build.environment]
-  HUGO_VERSION = "0.152.2"       # 精准匹配你本地的 0.152.2 版本
-  HUGO_EXTENDED = "true"          # 启用扩展版（你的版本带 extended）
-  HUGO_ENV = "production"         # 生产环境标识，避免路径异常
+[[headers]]
+  for = "/js/echarts.min.js"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
