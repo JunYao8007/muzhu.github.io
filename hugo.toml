@@ -32,7 +32,7 @@ theme = 'Amigo'
   # ---------------------------------------------------------------------------------------
   username = "Junyao"
   # 头像地址（可以放本地路径比如 "/images/avatar.jpg"，也可以放网图链接）
-  avatar = "https://laomuzhu.cn/touxiang.jpg"
+  avatar = "https://www.mulk.cn/touxiang.jpg"
   
   # 个人简介，会显示在头像旁边
   description = "造价工程师 现居山东青岛"

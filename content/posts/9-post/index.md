@@ -7,7 +7,7 @@ location = ''
 brand = 'COST ✕ JUNYAO'
 badge = '广告'
 cta = '了解更多'
-adlink = 'https://laomuzhu.cn'
+adlink = 'https://mulk.cn'
 logo = 'logo.png'
 +++
 
